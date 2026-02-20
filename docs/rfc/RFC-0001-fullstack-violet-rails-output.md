@@ -173,7 +173,7 @@ A generation job is considered successful only if all pass:
 
 ## 13) Decision-Tree Execution Addendum (2026-02-20)
 
-This RFC now links to release issue `R1-021` (`planning/release-r1/tickets.json`) to force one explicit execution branch and prevent mixed-strategy drift.
+This RFC now links to release issue `R1-021` (`planning/release-r1/tickets.json`) and GitHub issue `#1` (`https://github.com/ChaiWithJai/violet-deterministic-api/issues/1`) to force one explicit execution branch and prevent mixed-strategy drift.
 
 ### Branch A: Deterministic Platform First
 
