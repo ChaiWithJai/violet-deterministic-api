@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { JTBDCoverage as JTBDType } from '../../lib/api/types';
+  import type { JTBDCoverageItem } from '../../lib/api/types';
   import Badge from '../shared/Badge.svelte';
 
   interface Props {
-    items: JTBDType[];
+    items: JTBDCoverageItem[];
   }
 
   let { items }: Props = $props();
@@ -13,11 +13,11 @@
   <h3 class="jtbd-title">JTBD Coverage</h3>
   <div class="jtbd-grid">
     {#each items as item}
-      <div class="jtbd-card" class:covered={item.covered}>
-        <Badge variant={item.covered ? 'pass' : 'default'}>
-          {item.covered ? 'Covered' : 'Pending'}
+      <div class="jtbd-card" class:covered={item.status === 'pass'}>
+        <Badge variant={item.status === 'pass' ? 'pass' : item.status === 'fail' ? 'fail' : 'default'}>
+          {item.status}
         </Badge>
-        <span class="jtbd-name">{item.jtbd}</span>
+        <span class="jtbd-name">{item.task}</span>
         {#if item.evidence}
           <p class="jtbd-evidence">{item.evidence}</p>
         {/if}

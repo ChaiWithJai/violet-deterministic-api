@@ -1,64 +1,96 @@
 <script lang="ts">
-  import type { AgentPlanResponse, StudioJobRequest } from '../../lib/api/types';
+  import type { Confirmation, StudioJobRequest } from '../../lib/api/types';
   import PillButton from '../shared/PillButton.svelte';
 
   interface Props {
-    plan: AgentPlanResponse;
+    confirmation: Partial<Confirmation>;
+    checks: string[];
     ongenerate: (req: StudioJobRequest) => void;
     loading?: boolean;
   }
 
-  let { plan, ongenerate, loading = false }: Props = $props();
-
-  let appName = $state('');
-  let domain = $state('');
-  let template = $state('violet-rails-extension');
+  let { confirmation, checks, ongenerate, loading = false }: Props = $props();
 
   function handleGenerate() {
     ongenerate({
-      prompt: plan.steps.map((s) => s.description).join('\n'),
-      app_name: appName || undefined,
-      domain: domain || undefined,
-      template,
+      prompt: confirmation.prompt ?? '',
+      app_name: confirmation.app_name,
+      domain: confirmation.domain,
+      template: confirmation.template,
+      source_system: confirmation.source_system,
+      primary_users: confirmation.primary_users,
+      core_workflows: confirmation.core_workflows,
+      data_entities: confirmation.data_entities,
+      deployment_target: confirmation.deployment_target,
+      region: confirmation.region,
     });
   }
+
+  const fields: { key: keyof Confirmation; label: string }[] = [
+    { key: 'app_name', label: 'App Name' },
+    { key: 'domain', label: 'Domain' },
+    { key: 'template', label: 'Template' },
+    { key: 'source_system', label: 'Source System' },
+    { key: 'deployment_target', label: 'Deployment Target' },
+    { key: 'region', label: 'Region' },
+    { key: 'plan', label: 'Plan' },
+  ];
+
+  const arrayFields: { key: keyof Confirmation; label: string }[] = [
+    { key: 'primary_users', label: 'Primary Users' },
+    { key: 'core_workflows', label: 'Core Workflows' },
+    { key: 'data_entities', label: 'Data Entities' },
+    { key: 'integrations', label: 'Integrations' },
+    { key: 'constraints', label: 'Constraints' },
+  ];
 </script>
 
 <div class="confirm-form">
   <h2 class="confirm-title">Scope Confirmation</h2>
 
-  <div class="steps-list">
-    {#each plan.steps as step}
-      <div class="step-card">
-        <span class="step-num">{step.step}</span>
-        <div class="step-content">
-          <span class="step-action">{step.action}</span>
-          <p class="step-desc">{step.description}</p>
+  {#if checks.length > 0}
+    <div class="checks-list">
+      {#each checks as check}
+        <div class="check-item">
+          <span class="check-icon">&#10003;</span>
+          <span class="check-text">{check}</span>
         </div>
-      </div>
+      {/each}
+    </div>
+  {/if}
+
+  <div class="confirmation-grid">
+    {#each fields as { key, label }}
+      {@const val = confirmation[key]}
+      {#if val && typeof val === 'string'}
+        <div class="conf-field">
+          <span class="conf-label">{label}</span>
+          <span class="conf-value">{val}</span>
+        </div>
+      {/if}
+    {/each}
+
+    {#each arrayFields as { key, label }}
+      {@const arr = confirmation[key]}
+      {#if Array.isArray(arr) && arr.length > 0}
+        <div class="conf-field">
+          <span class="conf-label">{label}</span>
+          <div class="conf-pills">
+            {#each arr as item}
+              <span class="conf-pill">{item}</span>
+            {/each}
+          </div>
+        </div>
+      {/if}
     {/each}
   </div>
 
-  <div class="form-fields">
-    <label class="field">
-      <span class="field-label">App Name (optional)</span>
-      <input type="text" class="field-input" placeholder="my-saas-app" bind:value={appName} />
-    </label>
-
-    <label class="field">
-      <span class="field-label">Domain (optional)</span>
-      <input type="text" class="field-input" placeholder="app.example.com" bind:value={domain} />
-    </label>
-
-    <label class="field">
-      <span class="field-label">Template</span>
-      <select class="field-input" bind:value={template}>
-        <option value="violet-rails-extension">Violet Rails Extension</option>
-        <option value="standalone">Standalone</option>
-        <option value="api-only">API Only</option>
-      </select>
-    </label>
-  </div>
+  {#if confirmation.prompt}
+    <div class="prompt-preview">
+      <span class="conf-label">Original Prompt</span>
+      <p class="prompt-text">{confirmation.prompt}</p>
+    </div>
+  {/if}
 
   <PillButton size="lg" onclick={handleGenerate} disabled={loading}>
     {loading ? 'Creating Job...' : 'Generate'}
@@ -82,94 +114,97 @@
     color: var(--text-primary);
   }
 
-  .steps-list {
+  .checks-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background: var(--pass-subtle);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    border-radius: var(--radius-md);
   }
 
-  .step-card {
+  .check-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.8125rem;
+  }
+
+  .check-icon {
+    color: var(--pass);
+    font-weight: 700;
+    font-size: 0.75rem;
+  }
+
+  .check-text {
+    color: var(--text-secondary);
+  }
+
+  .confirmation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-md);
+  }
+
+  @media (max-width: 640px) {
+    .confirmation-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .conf-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
     padding: var(--space-md);
     background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
   }
 
-  .step-num {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--accent-subtle);
-    color: var(--accent);
-    border-radius: 50%;
-    font-family: var(--font-code);
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-
-  .step-content {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .step-action {
-    font-size: 0.75rem;
+  .conf-label {
+    font-size: 0.6875rem;
     font-weight: 600;
-    color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    color: var(--text-tertiary);
   }
 
-  .step-desc {
+  .conf-value {
     font-size: 0.875rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
+    color: var(--text-primary);
   }
 
-  .form-fields {
+  .conf-pills {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: var(--space-xs);
   }
 
-  .field-label {
+  .conf-pill {
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--accent-subtle);
     font-size: 0.75rem;
+    color: var(--accent);
     font-weight: 500;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
 
-  .field-input {
-    width: 100%;
-    padding: 10px 14px;
+  .prompt-preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
     background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
+  }
+
+  .prompt-text {
     font-size: 0.8125rem;
-    color: var(--text-primary);
-    transition: border-color var(--duration-fast) var(--ease-out);
-  }
-
-  .field-input:focus {
-    border-color: var(--accent);
-  }
-
-  select.field-input {
-    cursor: pointer;
-    appearance: auto;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-style: italic;
   }
 </style>

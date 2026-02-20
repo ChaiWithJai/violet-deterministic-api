@@ -1,44 +1,43 @@
 <script lang="ts">
-  import type { StudioEvent } from '../../lib/api/types';
+  import type { WorkloadItem } from '../../lib/api/types';
+  import Badge from '../shared/Badge.svelte';
 
   interface Props {
-    events: StudioEvent[];
-    currentPhase: string;
+    workload: WorkloadItem[];
   }
 
-  let { events, currentPhase }: Props = $props();
+  let { workload }: Props = $props();
 
-  const phases = ['plan', 'scaffold', 'generate', 'verify', 'bundle'];
-
-  function phaseStatus(phase: string): 'done' | 'active' | 'pending' {
-    const idx = phases.indexOf(phase);
-    const currentIdx = phases.indexOf(currentPhase);
-    if (currentIdx < 0) return 'pending';
-    if (idx < currentIdx) return 'done';
-    if (idx === currentIdx) return 'active';
-    return 'pending';
-  }
-
-  function phaseEvents(phase: string): StudioEvent[] {
-    return events.filter((e) => e.phase === phase);
+  function statusVariant(status: string): 'pass' | 'fail' | 'degraded' | 'default' {
+    if (status === 'done' || status === 'complete') return 'pass';
+    if (status === 'in_progress' || status === 'active') return 'degraded';
+    if (status === 'failed') return 'fail';
+    return 'default';
   }
 </script>
 
 <div class="timeline">
-  {#each phases as phase}
-    {@const status = phaseStatus(phase)}
-    <div class="timeline-phase {status}">
+  {#each workload as item}
+    <div class="timeline-phase" class:done={item.status === 'done' || item.status === 'complete'} class:active={item.status === 'in_progress' || item.status === 'active'}>
       <div class="phase-dot">
-        {#if status === 'done'}✓{:else if status === 'active'}●{:else}○{/if}
+        {#if item.status === 'done' || item.status === 'complete'}&#10003;{:else if item.status === 'in_progress' || item.status === 'active'}&#9679;{:else}&#9675;{/if}
       </div>
       <div class="phase-content">
-        <span class="phase-name">{phase}</span>
-        {#each phaseEvents(phase) as event}
-          <p class="phase-event">{event.message || event.type}</p>
-        {/each}
+        <div class="phase-header">
+          <span class="phase-name">{item.phase}</span>
+          <Badge variant={statusVariant(item.status)}>{item.status}</Badge>
+        </div>
+        <p class="phase-task">{item.task}</p>
+        <div class="phase-meta">
+          <span class="meta-owner">{item.owner}</span>
+          <span class="meta-estimate">{item.estimate_hours}h est.</span>
+        </div>
       </div>
     </div>
   {/each}
+  {#if workload.length === 0}
+    <div class="empty-state">No workload items yet</div>
+  {/if}
 </div>
 
 <style>
@@ -100,8 +99,15 @@
   .phase-content {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
     padding-top: 2px;
+    flex: 1;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
   }
 
   .phase-name {
@@ -111,13 +117,23 @@
     color: var(--text-primary);
   }
 
-  .pending .phase-name {
-    color: var(--text-tertiary);
-  }
-
-  .phase-event {
+  .phase-task {
     font-size: 0.75rem;
     color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .phase-meta {
+    display: flex;
+    gap: var(--space-md);
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
     font-family: var(--font-code);
+  }
+
+  .empty-state {
+    color: var(--text-tertiary);
+    font-style: italic;
+    padding: var(--space-md);
   }
 </style>

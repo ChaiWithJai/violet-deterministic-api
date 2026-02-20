@@ -1,11 +1,13 @@
 <script lang="ts">
+  import type { ManifestFile } from '../../lib/api/types';
+
   interface Props {
-    artifacts: Record<string, string>;
+    files: ManifestFile[];
     selectedFile: string;
     onselect: (path: string) => void;
   }
 
-  let { artifacts, selectedFile, onselect }: Props = $props();
+  let { files, selectedFile, onselect }: Props = $props();
 
   interface TreeNode {
     name: string;
@@ -14,11 +16,11 @@
     isFile: boolean;
   }
 
-  let tree = $derived(buildTree(artifacts));
+  let tree = $derived(buildTree(files));
 
-  function buildTree(files: Record<string, string>): TreeNode[] {
+  function buildTree(fileList: ManifestFile[]): TreeNode[] {
     const root: TreeNode[] = [];
-    const paths = Object.keys(files).sort();
+    const paths = fileList.map((f) => f.path).sort();
 
     for (const path of paths) {
       const parts = path.split('/');
@@ -68,7 +70,7 @@
       style="padding-left: {12 + depth * 16}px"
       onclick={() => onselect(node.path)}
     >
-      <span class="tree-icon">📄</span>
+      <span class="tree-icon file-icon"></span>
       {node.name}
     </button>
   {:else}
@@ -77,7 +79,7 @@
       style="padding-left: {12 + depth * 16}px"
       onclick={() => toggle(node.path)}
     >
-      <span class="tree-icon">{expanded.has(node.path) ? '📂' : '📁'}</span>
+      <span class="tree-icon">{expanded.has(node.path) ? '\u25BE' : '\u25B8'}</span>
       {node.name}
     </button>
     {#if expanded.has(node.path)}
@@ -140,5 +142,12 @@
   .tree-icon {
     font-size: 0.75rem;
     flex-shrink: 0;
+    width: 14px;
+    text-align: center;
+  }
+
+  .file-icon::before {
+    content: '\2022';
+    color: var(--text-tertiary);
   }
 </style>

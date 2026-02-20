@@ -8,6 +8,8 @@
 
   let health = $state<HealthResponse | null>(null);
   let providers = $state<LLMProvider[]>([]);
+  let defaultProvider = $state('');
+  let defaultModel = $state('');
   let healthError = $state<string | null>(null);
   let token = $state(authStore.token);
   let baseUrl = $state(authStore.baseUrl);
@@ -26,7 +28,11 @@
 
   async function loadProviders() {
     const res = await getLLMProviders();
-    if (res.ok) providers = (res.data as any).providers || [];
+    if (res.ok) {
+      providers = res.data.providers ?? [];
+      defaultProvider = res.data.default_provider ?? '';
+      defaultModel = res.data.default_model ?? '';
+    }
   }
 
   function saveAuth() {
@@ -105,17 +111,24 @@
       {#each providers as provider}
         <div class="provider-card">
           <div class="provider-header">
-            <span class="provider-name">{provider.name}</span>
+            <span class="provider-name">
+              {provider.name}
+              {#if provider.name === defaultProvider}
+                <span class="default-badge">(default)</span>
+              {/if}
+            </span>
             <Badge variant={provider.status === 'available' ? 'pass' : 'default'}>
               {provider.status}
             </Badge>
           </div>
-          <span class="provider-type">{provider.type}</span>
           <div class="provider-models">
             {#each provider.models as model}
-              <Badge variant={model === provider.default_model ? 'accent' : 'default'}>
-                {model}
-              </Badge>
+              <div class="model-item">
+                <Badge variant={model.name === defaultModel ? 'accent' : 'default'}>
+                  {model.name}
+                </Badge>
+                <span class="model-ctx">{model.context_window.toLocaleString()} ctx</span>
+              </div>
             {/each}
           </div>
         </div>
@@ -254,16 +267,28 @@
     font-size: 0.875rem;
   }
 
-  .provider-type {
-    font-size: 0.75rem;
-    color: var(--text-tertiary);
-    font-family: var(--font-code);
+  .default-badge {
+    font-size: 0.6875rem;
+    font-weight: 400;
+    color: var(--accent);
   }
 
   .provider-models {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: var(--space-xs);
+  }
+
+  .model-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .model-ctx {
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-code);
   }
 
   .empty-text {

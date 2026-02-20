@@ -1,11 +1,14 @@
 <script lang="ts">
+  import type { ClarifyQuestion } from '../../lib/api/types';
+
   interface Props {
-    questions: string[];
+    questions: ClarifyQuestion[];
     onanswer: (answers: Record<string, string>) => void;
     loading?: boolean;
+    summary?: string;
   }
 
-  let { questions, onanswer, loading = false }: Props = $props();
+  let { questions, onanswer, loading = false, summary = '' }: Props = $props();
 
   let answers = $state<Record<string, string>>({});
 
@@ -15,39 +18,47 @@
     }
   }
 
-  const quickAnswers: Record<string, string[]> = {
-    default: ['Yes', 'No', 'Maybe later'],
-  };
-
-  function setQuickAnswer(qIdx: number, answer: string) {
-    answers[String(qIdx)] = answer;
+  function setAnswer(questionId: string, value: string) {
+    answers[questionId] = value;
   }
+
+  let answeredCount = $derived(Object.keys(answers).length);
 </script>
 
 <div class="clarify-chat">
-  {#each questions as question, i}
+  {#if summary}
+    <div class="summary-bar">{summary}</div>
+  {/if}
+
+  {#each questions as question}
     <div class="qa-card">
       <div class="qa-question">
         <span class="qa-icon">?</span>
-        <p>{question}</p>
+        <div class="qa-text">
+          <p class="qa-prompt">{question.prompt}</p>
+          <p class="qa-why">{question.why}</p>
+        </div>
       </div>
       <div class="qa-answer">
-        <div class="quick-pills">
-          {#each quickAnswers.default as pill}
-            <button
-              class="quick-pill"
-              class:active={answers[String(i)] === pill}
-              onclick={() => setQuickAnswer(i, pill)}
-            >
-              {pill}
-            </button>
-          {/each}
-        </div>
+        {#if question.options && question.options.length > 0}
+          <div class="quick-pills">
+            {#each question.options as option}
+              <button
+                class="quick-pill"
+                class:active={answers[question.id] === option}
+                onclick={() => setAnswer(question.id, option)}
+              >
+                {option}
+              </button>
+            {/each}
+          </div>
+        {/if}
         <input
           type="text"
           class="qa-input"
           placeholder="Or type a custom answer..."
-          bind:value={answers[String(i)]}
+          value={answers[question.id] ?? ''}
+          oninput={(e) => setAnswer(question.id, (e.target as HTMLInputElement).value)}
         />
       </div>
     </div>
@@ -56,9 +67,9 @@
   <button
     class="continue-btn"
     onclick={submit}
-    disabled={loading || Object.keys(answers).length < questions.length}
+    disabled={loading || answeredCount < questions.length}
   >
-    {loading ? 'Processing...' : 'Continue'}
+    {loading ? 'Processing...' : `Continue (${answeredCount}/${questions.length})`}
   </button>
 </div>
 
@@ -69,6 +80,15 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+  }
+
+  .summary-bar {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--accent-subtle);
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-md);
+    font-size: 0.8125rem;
+    color: var(--accent);
   }
 
   .qa-card {
@@ -101,10 +121,22 @@
     font-weight: 700;
   }
 
-  .qa-question p {
+  .qa-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .qa-prompt {
     font-size: 0.875rem;
     color: var(--text-primary);
     line-height: 1.5;
+  }
+
+  .qa-why {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    font-style: italic;
   }
 
   .qa-answer {

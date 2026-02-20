@@ -41,6 +41,10 @@
   {#if result}
     <div class="deploy-result">
       <div class="result-row">
+        <span>Intent ID:</span>
+        <code>{result.intent_id}</code>
+      </div>
+      <div class="result-row">
         <span>Status:</span>
         <Badge variant={result.status === 'pending_approval' ? 'degraded' : 'pass'}>
           {result.status}
@@ -53,8 +57,8 @@
         </Badge>
       </div>
       <div class="result-row">
-        <span>Type:</span>
-        <code>{result.deploy_type}</code>
+        <span>Target:</span>
+        <code>{result.target}</code>
       </div>
     </div>
   {/if}

@@ -51,7 +51,13 @@
         <Accordion title={tool.name}>
           <div class="tool-detail">
             <p class="tool-desc">{tool.description}</p>
-            <Badge variant="default">{tool.category}</Badge>
+            <div class="tool-meta">
+              <Badge variant="default">{tool.method}</Badge>
+              <code class="tool-path">{tool.path}</code>
+            </div>
+            {#if tool.cli}
+              <code class="tool-cli">{tool.cli}</code>
+            {/if}
           </div>
         </Accordion>
       {:else}
@@ -117,6 +123,25 @@
     font-size: 0.8125rem;
     color: var(--text-secondary);
     line-height: 1.5;
+  }
+
+  .tool-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .tool-path {
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+  }
+
+  .tool-cli {
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    display: block;
   }
 
   .empty-text {
