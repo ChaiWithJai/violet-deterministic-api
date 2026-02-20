@@ -172,6 +172,7 @@ export interface Confirmation {
   deployment_target: string;
   region: string;
   plan: string;
+  generation_depth: 'prototype' | 'pilot' | 'production-candidate';
   integrations: string[];
   constraints: string[];
 }
@@ -245,6 +246,7 @@ export interface StudioJobRequest {
   data_entities?: string[];
   deployment_target?: string;
   region?: string;
+  generation_depth?: 'prototype' | 'pilot' | 'production-candidate';
 }
 
 export interface WorkloadItem {
@@ -285,6 +287,8 @@ export interface VerificationReport {
   report_id: string;
   verdict: string;
   checks: VerifyCheck[];
+  depth_label: 'prototype' | 'pilot' | 'production-candidate';
+  behavioral_pass_rate: number;
   generated_at: string;
 }
 
@@ -299,6 +303,7 @@ export interface StudioJob {
   job_id: string;
   tenant_id: string;
   status: string;
+  depth_label: 'prototype' | 'pilot' | 'production-candidate';
   created_at: string;
   updated_at: string;
   workspace_path: string;

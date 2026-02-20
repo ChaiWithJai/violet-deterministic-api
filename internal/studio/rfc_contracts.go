@@ -2,6 +2,7 @@ package studio
 
 import (
 	"fmt"
+	"math"
 	"path/filepath"
 	"strings"
 	"time"
@@ -28,10 +29,12 @@ type RunTarget struct {
 }
 
 type VerificationReport struct {
-	ReportID    string              `json:"report_id"`
-	Verdict     string              `json:"verdict"`
-	Checks      []VerificationCheck `json:"checks"`
-	GeneratedAt time.Time           `json:"generated_at"`
+	ReportID           string              `json:"report_id"`
+	Verdict            string              `json:"verdict"`
+	DepthLabel         string              `json:"depth_label"`
+	BehavioralPassRate float64             `json:"behavioral_pass_rate"`
+	Checks             []VerificationCheck `json:"checks"`
+	GeneratedAt        time.Time           `json:"generated_at"`
 }
 
 type VerificationCheck struct {
@@ -81,10 +84,20 @@ func buildArtifactManifest(job Job) ArtifactManifest {
 func categorizeArtifact(path string) string {
 	normalized := filepath.ToSlash(strings.ToLower(strings.TrimSpace(path)))
 	switch {
+	case strings.Contains(normalized, "/clients/web/modules/"):
+		return "web_module"
 	case strings.Contains(normalized, "/clients/web/"):
 		return "web_client"
 	case strings.Contains(normalized, "/clients/mobile/"):
 		return "mobile_client"
+	case strings.Contains(normalized, "/internal/identity/"):
+		return "identity_module"
+	case strings.Contains(normalized, "/internal/primitives/"):
+		return "product_primitive"
+	case strings.Contains(normalized, "/config/rbac"):
+		return "auth_model"
+	case strings.Contains(normalized, "/docs/parity/"):
+		return "parity_doc"
 	case strings.Contains(normalized, "/internal/integrations/"):
 		return "integration_adapter"
 	case strings.Contains(normalized, "/services/api/"):
@@ -138,6 +151,36 @@ func buildVerificationReport(job Job) VerificationReport {
 			Status:   passFailStatus(hasConstraint(job.Confirmation.Constraints, "all_mutations_idempotent")),
 			Evidence: "idempotency constraint captured",
 		},
+		{
+			ID:       "depth_label_declared",
+			Status:   passFailStatus(isDepthLabel(normalizeDepthLabel(job.DepthLabel))),
+			Evidence: "studio job depth label is one of prototype/pilot/production-candidate",
+		},
+		{
+			ID:       "behavioral_fixtures_present",
+			Status:   passFailStatus(hasPaths(job.Files, "/tests/behavior/scenarios.yaml", "/services/api/tests/behavior.sh")),
+			Evidence: "behavioral fixture definitions generated for app + api runtime",
+		},
+		{
+			ID:       "behavioral_runtime_modules_present",
+			Status:   passFailStatus(hasPaths(job.Files, "/services/api/internal/runtime/entity_actions.go", "/services/api/internal/runtime/behavior_test.go")),
+			Evidence: "generated api runtime includes entity/action handlers and behavioral tests",
+		},
+		{
+			ID:       "behavioral_primitives_modules_present",
+			Status:   passFailStatus(hasPaths(job.Files, "/services/api/internal/primitives/module.go", "/clients/web/modules/cms.ts", "/clients/web/modules/blog.ts", "/clients/web/modules/forum.ts", "/clients/web/modules/email.ts")),
+			Evidence: "generated CMS/blog/forum/email modules present in runtime and web artifacts",
+		},
+		{
+			ID:       "behavioral_identity_modules_present",
+			Status:   passFailStatus(hasPaths(job.Files, "/services/api/internal/identity/module.go", "/services/api/internal/identity/providers/auth0_adapter.go", "/services/api/internal/identity/providers/clerk_adapter.go", "/services/api/internal/identity/providers/supabase_adapter.go", "/clients/web/modules/auth.ts", "/config/rbac.generated.json")),
+			Evidence: "generated identity lifecycle module, provider stubs, and RBAC model present",
+		},
+		{
+			ID:       "boundary_docs_present",
+			Status:   passFailStatus(hasPaths(job.Files, "/docs/parity/api-endpoint-matrix.md", "/docs/parity/control-plane-vs-runtime.md", "/docs/parity/migration-guide-content-community-email.md")),
+			Evidence: "generated docs inventory runtime parity and migration boundaries",
+		},
 	}
 
 	verdict := "pass"
@@ -148,10 +191,12 @@ func buildVerificationReport(job Job) VerificationReport {
 		}
 	}
 	return VerificationReport{
-		ReportID:    makeID("studio_vrf", job.TenantID, job.JobID, fmt.Sprintf("%d", job.UpdatedAt.UnixNano())),
-		Verdict:     verdict,
-		Checks:      checks,
-		GeneratedAt: time.Now().UTC(),
+		ReportID:           makeID("studio_vrf", job.TenantID, job.JobID, fmt.Sprintf("%d", job.UpdatedAt.UnixNano())),
+		Verdict:            verdict,
+		DepthLabel:         normalizeDepthLabel(job.DepthLabel),
+		BehavioralPassRate: behavioralPassRate(checks),
+		Checks:             checks,
+		GeneratedAt:        time.Now().UTC(),
 	}
 }
 
@@ -172,8 +217,8 @@ func buildJTBDCoverage(job Job) []JTBDCoverage {
 		{
 			ID:       "jtbd_validate_behavior",
 			Task:     "Validate behavior before deploy",
-			Status:   passFailStatus(job.Verification.Verdict == "pass"),
-			Evidence: "verification verdict from deterministic checks",
+			Status:   passFailStatus(job.Verification.Verdict == "pass" && job.Verification.BehavioralPassRate >= 1),
+			Evidence: fmt.Sprintf("verification verdict=%s behavioral_pass_rate=%.2f", job.Verification.Verdict, job.Verification.BehavioralPassRate),
 		},
 		{
 			ID:       "jtbd_operate_human_ai",
@@ -184,8 +229,20 @@ func buildJTBDCoverage(job Job) []JTBDCoverage {
 		{
 			ID:       "jtbd_backend_runtime",
 			Task:     "Run generated backend service",
-			Status:   passFailStatus(hasPaths(job.Files, "/services/api/go.mod", "/services/api/cmd/server/main.go", "/services/api/internal/runtime/server.go")),
-			Evidence: "backend runtime scaffold generated",
+			Status:   passFailStatus(hasPaths(job.Files, "/services/api/go.mod", "/services/api/cmd/server/main.go", "/services/api/internal/runtime/server.go", "/services/api/internal/runtime/entity_actions.go")),
+			Evidence: "backend runtime scaffold + behavioral entity/action handlers generated",
+		},
+		{
+			ID:       "jtbd_product_primitives",
+			Task:     "Deliver product primitives in generated runtime",
+			Status:   passFailStatus(hasPaths(job.Files, "/services/api/internal/primitives/module.go", "/clients/web/modules/cms.ts", "/clients/web/modules/blog.ts", "/clients/web/modules/forum.ts", "/clients/web/modules/email.ts")),
+			Evidence: "generated primitives modules for cms/blog/forum/email",
+		},
+		{
+			ID:       "jtbd_user_lifecycle_governance",
+			Task:     "Deliver generated user lifecycle and governance seams",
+			Status:   passFailStatus(hasPaths(job.Files, "/services/api/internal/identity/module.go", "/config/rbac.generated.json", "/clients/web/modules/auth.ts")),
+			Evidence: "generated identity routes, RBAC model, and web auth module",
 		},
 		{
 			ID:       "jtbd_ship",
@@ -217,6 +274,10 @@ func runTargetChecks(job Job, target string) []VerificationCheck {
 			{ID: "api_agent_contract", Status: passFailStatus(hasPaths(job.Files, "/src/agent_contract.ts")), Evidence: "agent contract generated"},
 			{ID: "api_service_runtime", Status: passFailStatus(hasPaths(job.Files, "/services/api/go.mod", "/services/api/cmd/server/main.go", "/services/api/internal/runtime/server.go")), Evidence: "backend runtime scaffold generated"},
 			{ID: "api_service_tests", Status: passFailStatus(hasPaths(job.Files, "/services/api/internal/runtime/server_test.go", "/services/api/tests/smoke.sh")), Evidence: "backend runtime tests generated"},
+			{ID: "api_dynamic_entity_runtime", Status: passFailStatus(hasPaths(job.Files, "/services/api/internal/runtime/entity_actions.go")), Evidence: "generated runtime entity CRUD and action handlers present"},
+			{ID: "api_primitives_modules", Status: passFailStatus(hasPaths(job.Files, "/services/api/internal/primitives/module.go")), Evidence: "generated primitives runtime module present"},
+			{ID: "api_identity_modules", Status: passFailStatus(hasPaths(job.Files, "/services/api/internal/identity/module.go", "/services/api/internal/identity/providers/auth0_adapter.go", "/services/api/internal/identity/providers/clerk_adapter.go", "/services/api/internal/identity/providers/supabase_adapter.go")), Evidence: "generated identity lifecycle runtime module and provider stubs present"},
+			{ID: "api_behavioral_fixtures", Status: passFailStatus(hasPaths(job.Files, "/tests/behavior/scenarios.yaml", "/services/api/tests/behavior.sh", "/services/api/internal/runtime/behavior_test.go")), Evidence: "generated behavioral scenarios and executable fixtures present"},
 		}
 	case "verify":
 		return job.Verification.Checks
@@ -263,6 +324,33 @@ func hasConstraint(constraints []string, needle string) bool {
 		}
 	}
 	return false
+}
+
+func behavioralPassRate(checks []VerificationCheck) float64 {
+	behavioral := 0
+	passed := 0
+	for _, check := range checks {
+		if strings.HasPrefix(check.ID, "behavioral_") {
+			behavioral++
+			if check.Status == "pass" {
+				passed++
+			}
+		}
+	}
+	if behavioral == 0 {
+		return 0
+	}
+	ratio := float64(passed) / float64(behavioral)
+	return math.Round(ratio*100) / 100
+}
+
+func isDepthLabel(value string) bool {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "prototype", "pilot", "production-candidate":
+		return true
+	default:
+		return false
+	}
 }
 
 func passFailStatus(ok bool) string {

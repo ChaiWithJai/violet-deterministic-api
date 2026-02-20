@@ -83,6 +83,30 @@ export async function api<T>(
     const data = (await parseResponseBody(res)) as T;
     return { ok: res.ok, status: res.status, data };
   } catch (err) {
+    const canRetryOnOrigin =
+      typeof window !== 'undefined' &&
+      authStore.baseUrl &&
+      authStore.baseUrl !== window.location.origin;
+
+    if (canRetryOnOrigin) {
+      const fallbackUrl = joinApiUrl(window.location.origin, path);
+      try {
+        const fallbackRes = await fetch(fallbackUrl, {
+          method,
+          headers,
+          body: body === undefined ? undefined : JSON.stringify(body),
+        });
+        const fallbackData = (await parseResponseBody(fallbackRes)) as T;
+        return {
+          ok: fallbackRes.ok,
+          status: fallbackRes.status,
+          data: fallbackData,
+        };
+      } catch {
+        // Continue to the canonical network_error payload below.
+      }
+    }
+
     return {
       ok: false,
       status: 0,
@@ -90,6 +114,8 @@ export async function api<T>(
         error: 'network_error',
         details: err instanceof Error ? err.message : String(err),
         url,
+        suggestion:
+          'Check API base URL and token in Settings. If UI and API share origin, set base URL to current origin.',
       } as T,
     };
   }

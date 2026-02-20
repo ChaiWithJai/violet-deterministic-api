@@ -15,6 +15,18 @@ import (
 	"time"
 )
 
+type runtimeSmokeResult struct {
+	HealthOK         bool
+	DepthLabelOK     bool
+	ToolsOK          bool
+	WorkflowOK       bool
+	EntityRecordsOK  bool
+	ActionExecuteOK  bool
+	PrimitivesCMSOK  bool
+	IdentityRoutesOK bool
+	Output           string
+}
+
 func (s *Service) runGeneratedAPIRuntimeChecks(job Job) []VerificationCheck {
 	serviceDir, ok := serviceWorkspacePath(job)
 	if !ok {
@@ -44,7 +56,7 @@ func (s *Service) runGeneratedAPIRuntimeChecks(job Job) []VerificationCheck {
 		}}
 	}
 
-	healthOK, toolsOK, workflowOK, runOutput, runErr := runGeneratedServerChecks(ctx, serviceDir)
+	smoke, runErr := runGeneratedServerChecks(ctx, serviceDir)
 	if runErr != nil {
 		return []VerificationCheck{
 			{
@@ -55,25 +67,9 @@ func (s *Service) runGeneratedAPIRuntimeChecks(job Job) []VerificationCheck {
 			{
 				ID:       "api_runtime_server_boot",
 				Status:   "fail",
-				Evidence: trimEvidence("go run ./cmd/server failed: "+runErr.Error()+" | "+runOutput, 240),
+				Evidence: trimEvidence("go run ./cmd/server failed: "+runErr.Error()+" | "+smoke.Output, 240),
 			},
 		}
-	}
-
-	healthCheck := VerificationCheck{
-		ID:       "api_runtime_health",
-		Status:   passFailStatus(healthOK),
-		Evidence: "GET /health responded with status=ok",
-	}
-	toolsCheck := VerificationCheck{
-		ID:       "api_runtime_tools_catalog",
-		Status:   passFailStatus(toolsOK),
-		Evidence: "GET /v1/tools returned tool list",
-	}
-	workflowCheck := VerificationCheck{
-		ID:       "api_runtime_workflow_execute",
-		Status:   passFailStatus(workflowOK),
-		Evidence: "POST /v1/workflows/execute returned accepted",
 	}
 
 	return []VerificationCheck{
@@ -87,9 +83,46 @@ func (s *Service) runGeneratedAPIRuntimeChecks(job Job) []VerificationCheck {
 			Status:   "pass",
 			Evidence: "go run ./cmd/server booted successfully",
 		},
-		healthCheck,
-		toolsCheck,
-		workflowCheck,
+		{
+			ID:       "api_runtime_health",
+			Status:   passFailStatus(smoke.HealthOK),
+			Evidence: "GET /health responded with status=ok",
+		},
+		{
+			ID:       "api_runtime_depth_label",
+			Status:   passFailStatus(smoke.DepthLabelOK),
+			Evidence: "GET /health included valid depth_label",
+		},
+		{
+			ID:       "api_runtime_tools_catalog",
+			Status:   passFailStatus(smoke.ToolsOK),
+			Evidence: "GET /v1/tools returned tool list",
+		},
+		{
+			ID:       "api_runtime_workflow_execute",
+			Status:   passFailStatus(smoke.WorkflowOK),
+			Evidence: "POST /v1/workflows/execute returned accepted",
+		},
+		{
+			ID:       "api_runtime_entity_records",
+			Status:   passFailStatus(smoke.EntityRecordsOK),
+			Evidence: "GET /v1/entities/{entity}/records responded",
+		},
+		{
+			ID:       "api_runtime_action_execute",
+			Status:   passFailStatus(smoke.ActionExecuteOK),
+			Evidence: "POST /v1/actions/execute returned accepted",
+		},
+		{
+			ID:       "api_runtime_primitives",
+			Status:   passFailStatus(smoke.PrimitivesCMSOK),
+			Evidence: "GET /v1/primitives/cms/pages returned seeded payload",
+		},
+		{
+			ID:       "api_runtime_identity",
+			Status:   passFailStatus(smoke.IdentityRoutesOK),
+			Evidence: "GET /v1/identity/providers returned provider stubs",
+		},
 	}
 }
 
@@ -103,10 +136,11 @@ func runGoCommand(ctx context.Context, dir string, args ...string) (string, erro
 	return out.String(), err
 }
 
-func runGeneratedServerChecks(parent context.Context, dir string) (bool, bool, bool, string, error) {
+func runGeneratedServerChecks(parent context.Context, dir string) (runtimeSmokeResult, error) {
+	result := runtimeSmokeResult{}
 	port, err := reserveFreePort()
 	if err != nil {
-		return false, false, false, "", err
+		return result, err
 	}
 	addr := fmt.Sprintf("127.0.0.1:%d", port)
 	baseURL := "http://" + addr
@@ -121,7 +155,8 @@ func runGeneratedServerChecks(parent context.Context, dir string) (bool, bool, b
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	if err := cmd.Start(); err != nil {
-		return false, false, false, out.String(), err
+		result.Output = out.String()
+		return result, err
 	}
 
 	waitDone := make(chan error, 1)
@@ -143,20 +178,30 @@ func runGeneratedServerChecks(parent context.Context, dir string) (bool, bool, b
 		select {
 		case err := <-waitDone:
 			if err != nil {
-				return false, false, false, out.String(), err
+				result.Output = out.String()
+				return result, err
 			}
-			return false, false, false, out.String(), fmt.Errorf("server exited before smoke checks")
+			result.Output = out.String()
+			return result, fmt.Errorf("server exited before smoke checks")
 		default:
 		}
-		ok := checkHealth(baseURL)
-		if ok {
-			toolsOK := checkTools(baseURL)
-			workflowOK := checkWorkflowExecute(baseURL)
-			return true, toolsOK, workflowOK, out.String(), nil
+		healthOK, depthLabelOK := checkHealth(baseURL)
+		if healthOK {
+			result.HealthOK = true
+			result.DepthLabelOK = depthLabelOK
+			result.ToolsOK = checkTools(baseURL)
+			result.WorkflowOK = checkWorkflowExecute(baseURL)
+			result.EntityRecordsOK = checkEntityRecords(baseURL)
+			result.ActionExecuteOK = checkExecuteAction(baseURL)
+			result.PrimitivesCMSOK = checkPrimitivesCMS(baseURL)
+			result.IdentityRoutesOK = checkIdentityProviders(baseURL)
+			result.Output = out.String()
+			return result, nil
 		}
 		time.Sleep(150 * time.Millisecond)
 	}
-	return false, false, false, out.String(), fmt.Errorf("health check timeout")
+	result.Output = out.String()
+	return result, fmt.Errorf("health check timeout")
 }
 
 func reserveFreePort() (int, error) {
@@ -178,22 +223,23 @@ func reserveFreePort() (int, error) {
 	return port, nil
 }
 
-func checkHealth(baseURL string) bool {
+func checkHealth(baseURL string) (bool, bool) {
 	client := &http.Client{Timeout: 2 * time.Second}
 	resp, err := client.Get(baseURL + "/health")
 	if err != nil {
-		return false
+		return false, false
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return false
+		return false, false
 	}
 	var payload map[string]any
 	if err := json.NewDecoder(resp.Body).Decode(&payload); err != nil {
-		return false
+		return false, false
 	}
 	status, _ := payload["status"].(string)
-	return status == "ok"
+	depthLabel, _ := payload["depth_label"].(string)
+	return status == "ok", isDepthLabel(depthLabel)
 }
 
 func checkTools(baseURL string) bool {
@@ -233,6 +279,79 @@ func checkWorkflowExecute(baseURL string) bool {
 		return false
 	}
 	return bytes.Contains(body, []byte(`"accepted"`))
+}
+
+func checkEntityRecords(baseURL string) bool {
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get(baseURL + "/v1/entities/account/records")
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false
+	}
+	return bytes.Contains(body, []byte(`"records"`))
+}
+
+func checkExecuteAction(baseURL string) bool {
+	client := &http.Client{Timeout: 2 * time.Second}
+	req, err := http.NewRequest(http.MethodPost, baseURL+"/v1/actions/execute", strings.NewReader(`{"action":"approve_request","entity":"account","payload":{"mode":"runtime_smoke"}}`))
+	if err != nil {
+		return false
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false
+	}
+	return bytes.Contains(body, []byte(`"accepted"`))
+}
+
+func checkPrimitivesCMS(baseURL string) bool {
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get(baseURL + "/v1/primitives/cms/pages")
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false
+	}
+	return bytes.Contains(body, []byte(`"pages"`))
+}
+
+func checkIdentityProviders(baseURL string) bool {
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get(baseURL + "/v1/identity/providers")
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false
+	}
+	return bytes.Contains(body, []byte(`"providers"`))
 }
 
 func serviceWorkspacePath(job Job) (string, bool) {

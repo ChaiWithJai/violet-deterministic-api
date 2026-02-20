@@ -23,6 +23,7 @@
       data_entities: confirmation.data_entities,
       deployment_target: confirmation.deployment_target,
       region: confirmation.region,
+      generation_depth: confirmation.generation_depth,
     });
   }
 
@@ -34,6 +35,7 @@
     { key: 'deployment_target', label: 'Deployment Target' },
     { key: 'region', label: 'Region' },
     { key: 'plan', label: 'Plan' },
+    { key: 'generation_depth', label: 'Generation Depth' },
   ];
 
   const arrayFields: { key: keyof Confirmation; label: string }[] = [

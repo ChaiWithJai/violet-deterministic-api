@@ -27,6 +27,7 @@ type Confirmation struct {
 	DeploymentTarget string   `json:"deployment_target"`
 	Region           string   `json:"region"`
 	Plan             string   `json:"plan"`
+	GenerationDepth  string   `json:"generation_depth"`
 	Integrations     []string `json:"integrations"`
 	Constraints      []string `json:"constraints"`
 }
@@ -49,6 +50,7 @@ type Job struct {
 	JobID            string             `json:"job_id"`
 	TenantID         string             `json:"tenant_id"`
 	Status           string             `json:"status"`
+	DepthLabel       string             `json:"depth_label"`
 	CreatedAt        time.Time          `json:"created_at"`
 	UpdatedAt        time.Time          `json:"updated_at"`
 	WorkspacePath    string             `json:"workspace_path"`
@@ -127,6 +129,7 @@ func (s *Service) CreateJob(tenantID string, conf Confirmation) Job {
 	if conf.Plan == "" {
 		conf.Plan = "starter"
 	}
+	conf.GenerationDepth = normalizeDepthLabel(conf.GenerationDepth)
 	if conf.Template == "" {
 		conf.Template = "violet-rails-extension"
 	}
@@ -173,6 +176,7 @@ func (s *Service) CreateJob(tenantID string, conf Confirmation) Job {
 		JobID:           jobID,
 		TenantID:        tenantID,
 		Status:          "generated",
+		DepthLabel:      conf.GenerationDepth,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 		WorkspacePath:   workspacePath,
@@ -483,6 +487,7 @@ checks:
 		{Path: fmt.Sprintf("apps/%s/boilerplate/violet_rails_extension.md", slug), Language: "markdown", Content: violetRailsExtensionNotes(conf)},
 	}
 	files = append(files, runtimeSourceArtifacts(slug, conf)...)
+	files = append(files, paritySupportArtifacts(slug, conf)...)
 	files = append(files, backendRuntimeArtifacts(slug, conf)...)
 	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
 	return files
@@ -561,6 +566,9 @@ func listPaths(files []FileArtifact, prefix string) []string {
 func (s *Service) enrichJob(job *Job) {
 	if job == nil {
 		return
+	}
+	if strings.TrimSpace(job.DepthLabel) == "" {
+		job.DepthLabel = normalizeDepthLabel(job.Confirmation.GenerationDepth)
 	}
 	s.ensureWorkspace(job)
 	job.ArtifactManifest = buildArtifactManifest(*job)
@@ -731,6 +739,19 @@ func toYAMLList(items []string) string {
 		return "  - none"
 	}
 	return strings.Join(rows, "\n")
+}
+
+func normalizeDepthLabel(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "prototype":
+		return "prototype"
+	case "production-candidate":
+		return "production-candidate"
+	case "pilot":
+		return "pilot"
+	default:
+		return "pilot"
+	}
 }
 
 func makeID(prefix string, parts ...string) string {
