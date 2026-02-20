@@ -87,19 +87,15 @@ export interface CreateAppRequest {
 }
 
 export interface MutationRequest {
-  mutation_class: string;
+  class: string;
   path: string;
   value: unknown;
 }
 
 export interface MutationResponse {
-  app_id: string;
-  mutation_class: string;
-  path: string;
-  value: unknown;
-  version: number;
-  policy_check: 'pass' | 'fail';
-  policy_reason?: string;
+  mutation_id: string;
+  policy_version: string;
+  app: App;
 }
 
 export interface VerifyCheck {
@@ -339,15 +335,14 @@ export interface ConsoleResponse {
 }
 
 // --- LLM ---
-export interface LLMModel {
-  name: string;
-  context_window: number;
-}
-
 export interface LLMProvider {
   name: string;
-  status: string;
-  models: LLMModel[];
+  kind: string;
+  base_url: string;
+  default_model: string;
+  reachable: boolean;
+  models: string[];
+  error?: string;
 }
 
 export interface LLMProvidersResponse {

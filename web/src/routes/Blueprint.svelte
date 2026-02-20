@@ -12,7 +12,12 @@
     deploySelfHost,
     deployManaged,
   } from '../lib/api/endpoints';
-  import type { MutationResponse, VerifyResponse, DeployIntentResponse } from '../lib/api/types';
+  import type {
+    MutationRequest,
+    MutationResponse,
+    VerifyResponse,
+    DeployIntentResponse,
+  } from '../lib/api/types';
 
   interface Props {
     appId: string;
@@ -20,7 +25,12 @@
 
   let { appId }: Props = $props();
 
-  let mutations = $state<MutationResponse[]>([]);
+  type MutationHistoryEntry = {
+    request: MutationRequest;
+    response: MutationResponse;
+  };
+
+  let mutations = $state<MutationHistoryEntry[]>([]);
   let verifyResult = $state<VerifyResponse | null>(null);
   let deployResult = $state<DeployIntentResponse | null>(null);
   let loading = $state(false);
@@ -49,15 +59,16 @@
     let parsedValue: unknown = value;
     try { parsedValue = JSON.parse(value); } catch { /* keep as string */ }
 
-    const res = await createMutation(appId, {
-      mutation_class: cls,
+    const mutationRequest: MutationRequest = {
+      class: cls,
       path,
       value: parsedValue,
-    });
+    };
+    const res = await createMutation(appId, mutationRequest);
     loading = false;
 
     if (res.ok) {
-      mutations = [...mutations, res.data];
+      mutations = [...mutations, { request: mutationRequest, response: res.data }];
       loadApp();
     } else {
       error = (res.data as any).error || 'Mutation failed';

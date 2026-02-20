@@ -1,12 +1,17 @@
 <script lang="ts">
-  import type { MutationResponse } from '../../lib/api/types';
+  import type { MutationRequest, MutationResponse } from '../../lib/api/types';
   import PillButton from '../shared/PillButton.svelte';
   import Badge from '../shared/Badge.svelte';
+
+  interface MutationHistoryEntry {
+    request: MutationRequest;
+    response: MutationResponse;
+  }
 
   interface Props {
     appId: string;
     onmutate: (cls: string, path: string, value: string) => void;
-    results?: MutationResponse[];
+    results?: MutationHistoryEntry[];
     loading?: boolean;
   }
 
@@ -59,17 +64,19 @@
       {#each results as result}
         <div class="mutation-result">
           <div class="result-header">
-            <code>{result.mutation_class}</code>
-            <Badge variant={result.policy_check === 'pass' ? 'pass' : 'fail'}>
-              {result.policy_check}
+            <code>{result.response.mutation_id}</code>
+            <Badge variant="pass">
+              applied
             </Badge>
           </div>
           <div class="result-detail">
-            <span class="detail-path">{result.path}</span>
+            <span class="detail-path">{result.request.class} @ {result.request.path}</span>
             <span class="detail-arrow">→</span>
-            <span class="detail-value">{JSON.stringify(result.value)}</span>
+            <span class="detail-value">{JSON.stringify(result.request.value)}</span>
           </div>
-          <span class="result-version">v{result.version}</span>
+          <span class="result-version">
+            v{result.response.app.version} · {result.response.policy_version}
+          </span>
         </div>
       {/each}
     </div>

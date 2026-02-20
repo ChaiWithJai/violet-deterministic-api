@@ -117,17 +117,20 @@
                 <span class="default-badge">(default)</span>
               {/if}
             </span>
-            <Badge variant={provider.status === 'available' ? 'pass' : 'default'}>
-              {provider.status}
+            <Badge variant={provider.reachable ? 'pass' : 'default'}>
+              {provider.reachable ? 'reachable' : 'unreachable'}
             </Badge>
+          </div>
+          <div class="provider-meta">
+            <code>{provider.kind}</code>
+            <code>{provider.base_url}</code>
           </div>
           <div class="provider-models">
             {#each provider.models as model}
               <div class="model-item">
-                <Badge variant={model.name === defaultModel ? 'accent' : 'default'}>
-                  {model.name}
+                <Badge variant={model === defaultModel ? 'accent' : 'default'}>
+                  {model}
                 </Badge>
-                <span class="model-ctx">{model.context_window.toLocaleString()} ctx</span>
               </div>
             {/each}
           </div>
@@ -279,16 +282,22 @@
     gap: var(--space-xs);
   }
 
+  .provider-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .provider-meta code {
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-code);
+  }
+
   .model-item {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-  }
-
-  .model-ctx {
-    font-size: 0.6875rem;
-    color: var(--text-tertiary);
-    font-family: var(--font-code);
   }
 
   .empty-text {
