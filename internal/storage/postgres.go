@@ -244,6 +244,16 @@ func (s *Store) SaveStudioJob(ctx context.Context, tenantID, jobID string, paylo
 	return err
 }
 
+func (s *Store) SaveMigrationBundle(ctx context.Context, bundleID, tenantID, flow string, payload []byte) error {
+	_, err := s.db.ExecContext(ctx, `
+		INSERT INTO migration_bundles (bundle_id, tenant_id, flow, payload, created_at)
+		VALUES ($1, $2, $3, $4::jsonb, NOW())
+		ON CONFLICT (bundle_id)
+		DO UPDATE SET flow = EXCLUDED.flow, payload = EXCLUDED.payload
+	`, bundleID, tenantID, flow, string(payload))
+	return err
+}
+
 func (s *Store) GetStudioJob(ctx context.Context, tenantID, jobID string) ([]byte, bool, error) {
 	var payload []byte
 	err := s.db.QueryRowContext(ctx, `
@@ -316,12 +326,19 @@ func (s *Store) initSchema(ctx context.Context) error {
 			created_at TIMESTAMPTZ NOT NULL
 		)`,
 		`CREATE TABLE IF NOT EXISTS studio_jobs (
-			job_id TEXT PRIMARY KEY,
-			tenant_id TEXT NOT NULL,
-			payload JSONB NOT NULL,
-			created_at TIMESTAMPTZ NOT NULL,
-			updated_at TIMESTAMPTZ NOT NULL
-		)`,
+				job_id TEXT PRIMARY KEY,
+				tenant_id TEXT NOT NULL,
+				payload JSONB NOT NULL,
+				created_at TIMESTAMPTZ NOT NULL,
+				updated_at TIMESTAMPTZ NOT NULL
+			)`,
+		`CREATE TABLE IF NOT EXISTS migration_bundles (
+				bundle_id TEXT PRIMARY KEY,
+				tenant_id TEXT NOT NULL,
+				flow TEXT NOT NULL,
+				payload JSONB NOT NULL,
+				created_at TIMESTAMPTZ NOT NULL
+			)`,
 	}
 
 	for _, stmt := range stmts {

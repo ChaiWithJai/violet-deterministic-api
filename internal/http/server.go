@@ -93,6 +93,10 @@ func NewServer(cfg config.Config) (*Server, error) {
 	mux.HandleFunc("GET /v1/llm/providers", s.handleLLMProviders)
 	mux.HandleFunc("POST /v1/llm/infer", s.handleLLMInfer)
 	mux.HandleFunc("GET /v1/tools", s.handleToolsCatalog)
+
+	mux.HandleFunc("POST /v1/migration/violet/export", s.handleMigrationExport)
+	mux.HandleFunc("POST /v1/migration/violet/import", s.handleMigrationImport)
+
 	mux.HandleFunc("POST /v1/studio/jobs", s.handleStudioCreateJob)
 	mux.HandleFunc("GET /v1/studio/jobs/{id}", s.handleStudioGetJob)
 	mux.HandleFunc("GET /v1/studio/jobs/{id}/artifacts", s.handleStudioArtifacts)
