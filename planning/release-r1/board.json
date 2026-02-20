@@ -1,7 +1,7 @@
 {
   "release_id": "R1",
   "board_name": "R1 Prompt-to-Production Board",
-  "last_updated": "2026-02-20",
+  "last_updated": "2026-02-19",
   "columns": [
     {
       "id": "bet_accepted",
@@ -10,7 +10,10 @@
       "ticket_ids": [
         "R1-017",
         "R1-020",
-        "R1-021"
+        "R1-021",
+        "R1-022",
+        "R1-023",
+        "R1-025"
       ]
     },
     {
@@ -29,7 +32,9 @@
         "R1-014",
         "R1-015",
         "R1-018",
-        "R1-019"
+        "R1-019",
+        "R1-024",
+        "R1-026"
       ]
     },
     {

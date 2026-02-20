@@ -200,6 +200,70 @@ This RFC now links to release issue `R1-021` (`planning/release-r1/tickets.json`
 3. Migration parity endpoints and production-hardening evidence are still outstanding gates.
 4. End-user harness PRD target (`/ui/harness.html`) is not currently served; operator UI remains `/ui/`.
 
+## 14) Violet Rails Parity Gap Analysis (2026-02-19)
+
+This section formalizes the results of a systematic parity audit between VDA's implemented API surface and Violet Rails' production capabilities. The audit was conducted by comparing every VDA endpoint handler against the Violet Rails route map (`violet_routes.rb`).
+
+### 14.1 Parity Matrix
+
+| VDA Endpoint Family | What VDA Does Today | Violet Rails Equivalent | Parity | Shortfall |
+|---|---|---|---|---|
+| `/v1/decisions`, `/v1/replay`, `/v1/feedback` | Deterministic decisioning, stored replay, idempotent feedback | Dynamic API namespace/resource layer | Partial | Different paradigm: VDA does recommendation ranking, not broad data CRUD |
+| `/v1/apps`, mutations, verify, deploy-intents | Blueprint CRUD, constrained mutations (4 classes), verify, deploy intent | Namespaces, resources, forms, settings/workflow | Partial | Mutation model is narrow vs Violet's dynamic resource/action system |
+| `/v1/agents/{plan,clarify,act,verify,deploy}` | Full agent choreography with actor attribution | No direct equivalent | **VDA Advantage** | Net-new capability |
+| `/v1/llm/providers`, `/v1/llm/infer` | Provider discovery, inference, `studio_generate` hook | No first-class equivalent | **VDA Advantage** | Net-new capability |
+| `/v1/studio/jobs` + sub-endpoints | Workspace generation, artifacts, run targets, verification, JTBD, preview, bundle, terminal, console, SSE | Built-in product surfaces (CMS, blog, forum, mailbox) | Partial | Output is scaffold-heavy; verification is structural not behavioral |
+| `/v1/migration/violet/{export,import}` | Planned (R1-014, R1-015) but **not implemented** | Export/import implied by deprecation plan | **Missing** | No programmatic migration path exists |
+| Auth + governance | Token-based tenant auth (`token:tenant_id:subject`) | Devise, invites, OTP, sysadmin, subdomain | Partial | Strong request auth but no user lifecycle/admin/invite UX |
+| Content/community/email | None | CMS, blog, forum, mailbox/email tracking | **Missing** | Major gap vs "out-of-box SaaS platform" promise |
+| Analytics/GraphQL/ops | None | Ahoy analytics, Blazer, GraphQL, Sidekiq web | **Missing** | Operational tooling not present |
+
+### 14.2 Five Shortfall Areas (tracked as R1-022 through R1-026)
+
+**Shortfall 1: Built-in product primitives** (GitHub #4, R1-022)
+- CMS, blog, forum, and email are zero in VDA's API surface.
+- Recommended path: generate as Studio output modules, not native platform features.
+- Architectural rationale: dynamic content rendering conflicts with replay-safe determinism.
+
+**Shortfall 2: Dynamic API namespace/resource model** (GitHub #5, R1-023)
+- VDA's 4-class mutation model (`set_name`, `set_plan`, `set_region`, `set_feature_flag`) vs Violet's arbitrary resource CRUD.
+- Recommended path: accept as architectural boundary — rich data operations live in generated-app runtime, not VDA control plane. Evaluate schema-driven mutation expansion for R2.
+
+**Shortfall 3: Generated app depth** (GitHub #6, R1-024)
+- Verification is structural (schema/policy/deploy_preflight), not behavioral.
+- Recommended path: generate behavioral test fixtures alongside code; evolve run targets to execute behavioral tests; add depth labels (prototype/pilot/production-candidate).
+
+**Shortfall 4: User lifecycle governance** (GitHub #7, R1-025)
+- Token-based control-plane auth is solid but no end-user auth modules (registration, login, roles, invitations).
+- Recommended path: generate auth modules from confirmation metadata; document control-plane vs app-level auth separation.
+
+**Shortfall 5: Migration parity** (GitHub #8, R1-026)
+- Export/import endpoints are documented as required gates but have zero implementation.
+- Recommended path: elevate to P0; implement with roundtrip fidelity tests; block deprecation timeline on passing fixtures.
+
+### 14.3 Intentional Trade-Off
+
+Some gaps are architectural choices, not oversights:
+- **No dynamic runtime eval** preserves determinism and replay safety.
+- **Constrained mutation classes** keep the control plane auditable.
+- **Token-only auth** preserves replay fidelity (no session state to leak).
+
+The correct framing: VDA is a **deterministic build/deploy engine**, not a dynamic application runtime. Where Violet Rails is a monolith that runs apps, VDA is a factory that generates, verifies, and deploys them.
+
+### 14.4 Risk Register Additions
+
+| Risk ID | Title | Severity | Exit Criteria |
+|---|---|---|---|
+| RISK-006 | Product primitive gap blocks tenant migration | High | Migration guide published for workaround paths |
+| RISK-007 | Scaffold-level depth undermines credibility | High | Generated job passes behavioral JTBD scenarios |
+| RISK-008 | Migration endpoint absence blocks deprecation | Critical | Roundtrip export→import→export produces identical bundles |
+
+### 14.5 Board Impact
+
+- **R1-024** (depth) and **R1-026** (migration) added to **Uphill** — these are P0 blockers.
+- **R1-022** (primitives), **R1-023** (mutation model), **R1-025** (auth governance) added to **Bet Accepted** — P1, scoped for current cycle with cut option.
+- Circuit breaker rule remains: if S1/S2 unknowns unresolved by 2026-03-13, cut S5/S6 breadth.
+
 ---
 
-**Bottom line:** POC validated direction; this RFC changes success criteria from “generated something” to “generated a runnable, verifiable, deployable fullstack app that satisfies explicit JTBDs.”
+**Bottom line:** POC validated direction; this RFC changes success criteria from "generated something" to "generated a runnable, verifiable, deployable fullstack app that satisfies explicit JTBDs." The parity analysis confirms: VDA's deterministic core is materially implemented, but five shortfall areas must be addressed — either by building, generating, or explicitly deferring — before "replace Violet Rails" is credible.

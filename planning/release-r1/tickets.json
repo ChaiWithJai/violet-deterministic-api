@@ -513,6 +513,150 @@
         "RFC review against release gate criteria"
       ],
       "done_definition": "One execution branch is locked, reflected in RFC and board, and validated by passing end-to-end evidence"
+    },
+    {
+      "id": "R1-022",
+      "title": "Missing built-in product primitives (CMS/blog/forum/email)",
+      "scope": "S3",
+      "type": "risk",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "owner_role": "platform",
+      "appetite_days": 6,
+      "problem": "Violet Rails ships built-in CMS, blog, forum, and email capabilities. VDA has zero endpoints or handler code for content management, threaded discussions, or email operations. Users migrating from Violet lose core product modules.",
+      "objective": "Decide whether to generate product modules via Studio, build native API surface, or defer with explicit migration guidance. Document architectural boundary.",
+      "dependencies": ["R1-021", "R1-008"],
+      "acceptance_criteria": [
+        "Inventory of most-used Violet product primitives completed",
+        "Studio generation includes CMS/blog/forum module templates OR explicit deferral documented",
+        "Migration guide covers workaround path for affected tenants",
+        "RFC updated with product primitive scope boundary"
+      ],
+      "api_endpoints": [],
+      "test_plan": [
+        "Generated app includes content module if requested in prompt",
+        "Migration guide walkthrough validates workaround path"
+      ],
+      "done_definition": "Product primitive strategy documented and reflected in RFC scope boundary",
+      "github_issue": 4
+    },
+    {
+      "id": "R1-023",
+      "title": "Dynamic API namespace/resource/form/action model not matched",
+      "scope": "S3",
+      "type": "risk",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "owner_role": "platform",
+      "appetite_days": 5,
+      "problem": "VDA's mutation model supports only 4 hardcoded classes (set_name, set_plan, set_region, set_feature_flag) versus Violet Rails' dynamic namespace/resource/action routing that allows arbitrary resource CRUD at runtime.",
+      "objective": "Evaluate schema-driven mutation expansion versus accepting the constraint as an architectural boundary where rich data operations live in generated app runtime, not VDA control plane.",
+      "dependencies": ["R1-009", "R1-021"],
+      "acceptance_criteria": [
+        "Most-used Violet resource types and action patterns inventoried",
+        "Architectural boundary documented: control-plane mutations vs generated-app data operations",
+        "Studio-generated apps produce self-sufficient CRUD for declared data_entities",
+        "Option A (schema-driven mutations) technical feasibility evaluated for R2"
+      ],
+      "api_endpoints": ["POST /v1/apps/{id}/mutations"],
+      "test_plan": [
+        "Generated app CRUD covers confirmation data_entities",
+        "Mutation audit trail complete for all 4 classes"
+      ],
+      "done_definition": "Paradigm boundary documented and generated-app CRUD validated",
+      "github_issue": 5
+    },
+    {
+      "id": "R1-024",
+      "title": "Generated app depth is scaffold-level, not behavioral",
+      "scope": "S4",
+      "type": "risk",
+      "priority": "P0",
+      "status": "uphill",
+      "owner_role": "qa-platform",
+      "appetite_days": 6,
+      "problem": "Studio verification checks are structural (schema/policy/deploy_preflight), not behavioral. Generated apps compile and render but lack tested domain logic. JTBD coverage checks for scenario presence, not execution.",
+      "objective": "Evolve verification from structural checks to behavioral assertions. Generate test fixtures alongside code artifacts. Add depth labeling (prototype/pilot/production-candidate).",
+      "dependencies": ["R1-010", "R1-011", "R1-021"],
+      "acceptance_criteria": [
+        "Behavioral check categories defined beyond structural (unit, integration, e2e)",
+        "Generated test fixtures included in Studio output",
+        "Run targets execute behavioral tests, not just compile/lint",
+        "Depth label (prototype/pilot/production-candidate) added to Studio job model",
+        "Pass rate delta measured when behavioral checks added"
+      ],
+      "api_endpoints": [
+        "POST /v1/studio/jobs/{id}/run",
+        "GET /v1/studio/jobs/{id}/verification",
+        "GET /v1/studio/jobs/{id}/jtbd"
+      ],
+      "test_plan": [
+        "Generated CRM app passes behavioral JTBD scenarios",
+        "Verification report includes behavioral check results",
+        "Depth label correctly reflects check coverage level"
+      ],
+      "done_definition": "At least one generated job passes behavioral JTBD checks, not just structural",
+      "github_issue": 6
+    },
+    {
+      "id": "R1-025",
+      "title": "User lifecycle/admin/invite/subdomain governance is light",
+      "scope": "S3",
+      "type": "risk",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "owner_role": "security",
+      "appetite_days": 5,
+      "problem": "VDA has strong request-level tenant auth (token-based) but no user registration, login, password reset, invitation, role assignment, admin consoles, or subdomain governance. Generated apps cannot authenticate end-users.",
+      "objective": "Generate auth modules as part of Studio output (session/JWT/OAuth from confirmation metadata). Document separation of control-plane auth from generated-app auth.",
+      "dependencies": ["R1-003", "R1-019", "R1-021"],
+      "acceptance_criteria": [
+        "Studio generates auth module from confirmation metadata",
+        "Generated RBAC model derived from primary_users and constraints",
+        "Integration adapter templates for top 3 external auth providers",
+        "Control-plane vs generated-app auth separation documented"
+      ],
+      "api_endpoints": [],
+      "test_plan": [
+        "Generated app includes working auth flow",
+        "RBAC model reflects confirmation primary_users",
+        "Auth provider integration stubs compile"
+      ],
+      "done_definition": "Generated apps include working auth module; architecture boundary documented",
+      "github_issue": 7
+    },
+    {
+      "id": "R1-026",
+      "title": "Migration parity endpoints unimplemented — export/import gates outstanding",
+      "scope": "S6",
+      "type": "risk",
+      "priority": "P0",
+      "status": "uphill",
+      "owner_role": "migration",
+      "appetite_days": 8,
+      "problem": "POST /v1/migration/violet/export and POST /v1/migration/violet/import are documented as required gates in EXTRACTION_ROADMAP and DEPRECATION_PLAN but have no handler code, no route registration, and no implementation. R1-014 and R1-015 remain in uphill with no progress toward code.",
+      "objective": "Implement both migration endpoints with roundtrip fidelity, golden fixture validation, and reject-safe semantics. Unblock deprecation timeline.",
+      "dependencies": ["R1-014", "R1-015", "R1-008"],
+      "acceptance_criteria": [
+        "POST /v1/migration/violet/export handler implemented",
+        "POST /v1/migration/violet/import handler implemented",
+        "Routes registered in server.go",
+        "Golden fixture test suite from sampled Violet payloads",
+        "Roundtrip fidelity test passes (export -> import -> export = identical)",
+        "OpenAPI spec updated with migration endpoint schemas"
+      ],
+      "api_endpoints": [
+        "POST /v1/migration/violet/export",
+        "POST /v1/migration/violet/import"
+      ],
+      "test_plan": [
+        "Fixture export tests from sampled Violet payloads",
+        "Roundtrip export/import fidelity test",
+        "Compatibility mismatch rejection test",
+        "Unsupported field explicit reporting test"
+      ],
+      "done_definition": "Both endpoints implemented with passing roundtrip test suite; deprecation timeline unblocked",
+      "github_issue": 8
     }
   ]
 }

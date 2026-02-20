@@ -40,6 +40,30 @@
       "owner_role": "shaper",
       "mitigation": "Circuit breaker at Week 3 and no-go enforcement",
       "exit_criteria": "No unbounded ticket additions after Week 2"
+    },
+    {
+      "id": "RISK-006",
+      "title": "Product primitive gap blocks Violet tenant migration",
+      "severity": "high",
+      "owner_role": "platform",
+      "mitigation": "Generate CMS/blog/forum modules via Studio pipeline; document explicit scope boundary in RFC",
+      "exit_criteria": "Migration guide published for content/community/email workaround paths"
+    },
+    {
+      "id": "RISK-007",
+      "title": "Scaffold-level depth undermines prompt-to-app credibility",
+      "severity": "high",
+      "owner_role": "qa-platform",
+      "mitigation": "Evolve verification from structural to behavioral checks; add generated test fixtures to Studio output",
+      "exit_criteria": "At least one generated job passes behavioral JTBD scenarios, not just structural checks"
+    },
+    {
+      "id": "RISK-008",
+      "title": "Migration endpoint absence blocks deprecation timeline",
+      "severity": "critical",
+      "owner_role": "migration",
+      "mitigation": "Implement export/import endpoints (R1-014/R1-015) with roundtrip fidelity tests",
+      "exit_criteria": "Roundtrip export->import->export produces identical bundles on golden fixtures"
     }
   ]
 }
