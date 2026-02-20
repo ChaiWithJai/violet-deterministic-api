@@ -53,6 +53,8 @@ type Job struct {
 	DepthLabel       string             `json:"depth_label"`
 	CreatedAt        time.Time          `json:"created_at"`
 	UpdatedAt        time.Time          `json:"updated_at"`
+	LastRunAllStatus string             `json:"last_run_all_status,omitempty"`
+	LastRunAllAt     time.Time          `json:"last_run_all_at,omitempty"`
 	WorkspacePath    string             `json:"workspace_path"`
 	Confirmation     Confirmation       `json:"confirmation"`
 	Workload         []WorkloadItem     `json:"workload"`
@@ -329,6 +331,10 @@ func (s *Service) RunTarget(tenantID, jobID, target string) (RunResult, bool) {
 		Status:      status,
 		Checks:      checks,
 		GeneratedAt: time.Now().UTC(),
+	}
+	if targetName == "all" {
+		job.LastRunAllStatus = status
+		job.LastRunAllAt = result.GeneratedAt
 	}
 	job.ConsoleLogs = append(job.ConsoleLogs, fmt.Sprintf("[runner %s] run target=%s status=%s", time.Now().UTC().Format(time.RFC3339), result.Target, result.Status))
 	job.Status = "generated"

@@ -120,6 +120,23 @@ func categorizeArtifact(path string) string {
 }
 
 func buildVerificationReport(job Job) VerificationReport {
+	runtimeEvidence := "run target=all has not been executed for this job revision"
+	runtimeStatus := "fail"
+	if strings.EqualFold(strings.TrimSpace(job.LastRunAllStatus), "pass") {
+		runtimeStatus = "pass"
+		if !job.LastRunAllAt.IsZero() {
+			runtimeEvidence = fmt.Sprintf("latest run target=all passed at %s", job.LastRunAllAt.UTC().Format(time.RFC3339))
+		} else {
+			runtimeEvidence = "latest run target=all passed"
+		}
+	} else if strings.EqualFold(strings.TrimSpace(job.LastRunAllStatus), "fail") {
+		if !job.LastRunAllAt.IsZero() {
+			runtimeEvidence = fmt.Sprintf("latest run target=all failed at %s", job.LastRunAllAt.UTC().Format(time.RFC3339))
+		} else {
+			runtimeEvidence = "latest run target=all failed"
+		}
+	}
+
 	checks := []VerificationCheck{
 		{
 			ID:       "artifacts_required_present",
@@ -155,6 +172,11 @@ func buildVerificationReport(job Job) VerificationReport {
 			ID:       "depth_label_declared",
 			Status:   passFailStatus(isDepthLabel(normalizeDepthLabel(job.DepthLabel))),
 			Evidence: "studio job depth label is one of prototype/pilot/production-candidate",
+		},
+		{
+			ID:       "runtime_run_all_gate",
+			Status:   runtimeStatus,
+			Evidence: runtimeEvidence,
 		},
 		{
 			ID:       "behavioral_fixtures_present",
@@ -286,7 +308,6 @@ func runTargetChecks(job Job, target string) []VerificationCheck {
 		all = append(all, runTargetChecks(job, "web")...)
 		all = append(all, runTargetChecks(job, "mobile")...)
 		all = append(all, runTargetChecks(job, "api")...)
-		all = append(all, job.Verification.Checks...)
 		return all
 	}
 }

@@ -18,7 +18,10 @@
         "Replay endpoint retrieves exact payload from storage by decision_id",
         "Storage schema migration is documented and repeatable"
       ],
-      "api_endpoints": ["POST /v1/decisions", "POST /v1/replay"],
+      "api_endpoints": [
+        "POST /v1/decisions",
+        "POST /v1/replay"
+      ],
       "test_plan": [
         "Integration test with restart to prove persistence",
         "Replay fidelity diff against original payload"
@@ -36,13 +39,18 @@
       "appetite_days": 3,
       "problem": "Idempotency cache is memory-only and cannot survive restarts or scale-out.",
       "objective": "Add storage-backed idempotency keys with endpoint scoping and TTL cleanup.",
-      "dependencies": ["R1-001"],
+      "dependencies": [
+        "R1-001"
+      ],
       "acceptance_criteria": [
         "Idempotency-Key returns previously stored response for matching endpoint+key",
         "TTL expiry policy is configurable",
         "Cleanup job metrics exposed"
       ],
-      "api_endpoints": ["POST /v1/decisions", "POST /v1/feedback"],
+      "api_endpoints": [
+        "POST /v1/decisions",
+        "POST /v1/feedback"
+      ],
       "test_plan": [
         "Duplicate request test returns identical response",
         "Expired key test returns fresh decision"
@@ -66,7 +74,11 @@
         "Tenant mismatch returns explicit authorization error",
         "Audit log includes tenant_id and subject"
       ],
-      "api_endpoints": ["POST /v1/decisions", "POST /v1/feedback", "POST /v1/replay"],
+      "api_endpoints": [
+        "POST /v1/decisions",
+        "POST /v1/feedback",
+        "POST /v1/replay"
+      ],
       "test_plan": [
         "Auth bypass attempts fail",
         "Cross-tenant access tests fail as expected"
@@ -84,13 +96,17 @@
       "appetite_days": 2,
       "problem": "Hashing must remain stable across map ordering and serializer changes.",
       "objective": "Implement canonical JSON normalization for decision hash generation.",
-      "dependencies": ["R1-001"],
+      "dependencies": [
+        "R1-001"
+      ],
       "acceptance_criteria": [
         "Equivalent requests produce identical hash",
         "Field order does not alter hash",
         "Hash version tag included"
       ],
-      "api_endpoints": ["POST /v1/decisions"],
+      "api_endpoints": [
+        "POST /v1/decisions"
+      ],
       "test_plan": [
         "Property-based test for map field ordering",
         "Golden hash fixtures"
@@ -108,13 +124,17 @@
       "appetite_days": 4,
       "problem": "Current ranking is local-only and does not consume Gorse recommendations.",
       "objective": "Fetch candidate recommendations from Gorse and normalize into deterministic ranking input.",
-      "dependencies": ["R1-003"],
+      "dependencies": [
+        "R1-003"
+      ],
       "acceptance_criteria": [
         "Gorse adapter fetches and maps item candidates",
         "Timeout and degraded mode are explicit in response metadata",
         "Tie-breaking remains deterministic"
       ],
-      "api_endpoints": ["POST /v1/decisions"],
+      "api_endpoints": [
+        "POST /v1/decisions"
+      ],
       "test_plan": [
         "Adapter contract test against docker gorse",
         "Fallback test when gorse unavailable"
@@ -132,13 +152,17 @@
       "appetite_days": 4,
       "problem": "No policy runtime exists for deterministic eligibility and constraints.",
       "objective": "Evaluate policy artifacts through GoRules and include policy_version in outputs.",
-      "dependencies": ["R1-003"],
+      "dependencies": [
+        "R1-003"
+      ],
       "acceptance_criteria": [
         "Policy evaluation result affects final candidate set",
         "Policy version is embedded in response",
         "Policy evaluation errors are observable and explicit"
       ],
-      "api_endpoints": ["POST /v1/decisions"],
+      "api_endpoints": [
+        "POST /v1/decisions"
+      ],
       "test_plan": [
         "Unit test with static rule payload",
         "Version mismatch test and rollback scenario"
@@ -156,13 +180,18 @@
       "appetite_days": 3,
       "problem": "Execution order is not externally traceable for debugging.",
       "objective": "Add stage tracing with stable ordering and stage-level metadata.",
-      "dependencies": ["R1-005", "R1-006"],
+      "dependencies": [
+        "R1-005",
+        "R1-006"
+      ],
       "acceptance_criteria": [
         "Trace includes stage name, start/end, and outcome",
         "Trace ID is returned in decision response",
         "Trace is queryable for replay diagnostics"
       ],
-      "api_endpoints": ["POST /v1/decisions"],
+      "api_endpoints": [
+        "POST /v1/decisions"
+      ],
       "test_plan": [
         "Trace completeness test",
         "Ordering test for stage execution"
@@ -180,13 +209,19 @@
       "appetite_days": 4,
       "problem": "No API exists yet to define SaaS app models for prompt-driven builds.",
       "objective": "Provide baseline CRUD for app blueprint entities and workflow metadata.",
-      "dependencies": ["R1-003"],
+      "dependencies": [
+        "R1-003"
+      ],
       "acceptance_criteria": [
         "Blueprint create/update endpoints validate schema",
         "Read endpoint returns versioned blueprint document",
         "Tenant-scoped access enforced"
       ],
-      "api_endpoints": ["POST /v1/apps", "GET /v1/apps/{id}", "PATCH /v1/apps/{id}"],
+      "api_endpoints": [
+        "POST /v1/apps",
+        "GET /v1/apps/{id}",
+        "PATCH /v1/apps/{id}"
+      ],
       "test_plan": [
         "Schema validation tests",
         "Cross-tenant access denial tests"
@@ -204,13 +239,18 @@
       "appetite_days": 3,
       "problem": "Customization operations need constrained and auditable mutation semantics.",
       "objective": "Expose mutation endpoints with policy checks and idempotent semantics.",
-      "dependencies": ["R1-008", "R1-006"],
+      "dependencies": [
+        "R1-008",
+        "R1-006"
+      ],
       "acceptance_criteria": [
         "Mutation requests require idempotency key",
         "Policy guardrails enforce allowed mutation classes",
         "Audit records include before/after snapshots"
       ],
-      "api_endpoints": ["POST /v1/apps/{id}/mutations"],
+      "api_endpoints": [
+        "POST /v1/apps/{id}/mutations"
+      ],
       "test_plan": [
         "Mutation replay test",
         "Disallowed mutation rejection test"
@@ -228,13 +268,18 @@
       "appetite_days": 3,
       "problem": "Agents and humans need deterministic validation outputs before deploy.",
       "objective": "Add verify API returning structured checks with pass/fail and evidence.",
-      "dependencies": ["R1-008", "R1-009"],
+      "dependencies": [
+        "R1-008",
+        "R1-009"
+      ],
       "acceptance_criteria": [
         "Verify endpoint returns list of checks with status and evidence",
         "Verdict model is stable and documented",
         "Checks include schema, policy, and deployment preflight"
       ],
-      "api_endpoints": ["POST /v1/apps/{id}/verify"],
+      "api_endpoints": [
+        "POST /v1/apps/{id}/verify"
+      ],
       "test_plan": [
         "Golden verify response fixtures",
         "Failure mode check coverage"
@@ -252,13 +297,19 @@
       "appetite_days": 3,
       "problem": "No automated parity mechanism exists to detect replay drift.",
       "objective": "Build fixture runner that replays decision and verify flows and diffs outputs.",
-      "dependencies": ["R1-001", "R1-010"],
+      "dependencies": [
+        "R1-001",
+        "R1-010"
+      ],
       "acceptance_criteria": [
         "Fixtures are versioned and executable in CI",
         "Diff output is machine-readable",
         "Mismatch threshold reporting is generated"
       ],
-      "api_endpoints": ["POST /v1/replay", "POST /v1/apps/{id}/verify"],
+      "api_endpoints": [
+        "POST /v1/replay",
+        "POST /v1/apps/{id}/verify"
+      ],
       "test_plan": [
         "CI job runs fixture suite",
         "Intentional mismatch test fails build"
@@ -276,13 +327,17 @@
       "appetite_days": 3,
       "problem": "Users need deterministic output describing how to deploy generated apps themselves.",
       "objective": "Return deployment manifest and runbook for self-host target.",
-      "dependencies": ["R1-010"],
+      "dependencies": [
+        "R1-010"
+      ],
       "acceptance_criteria": [
         "API returns deterministic manifest artifact",
         "Manifest includes environment, services, and secrets references",
         "Runbook link included in response"
       ],
-      "api_endpoints": ["POST /v1/apps/{id}/deploy-intents/self-host"],
+      "api_endpoints": [
+        "POST /v1/apps/{id}/deploy-intents/self-host"
+      ],
       "test_plan": [
         "Manifest schema validation",
         "Idempotent intent regeneration test"
@@ -300,13 +355,17 @@
       "appetite_days": 3,
       "problem": "Managed service option needs a stable request contract for provisioning.",
       "objective": "Return managed deployment request object and approval status workflow.",
-      "dependencies": ["R1-010"],
+      "dependencies": [
+        "R1-010"
+      ],
       "acceptance_criteria": [
         "Managed intent payload includes plan, region, tenancy, and compliance flags",
         "Approval lifecycle states are documented",
         "Intent is auditable and idempotent"
       ],
-      "api_endpoints": ["POST /v1/apps/{id}/deploy-intents/managed"],
+      "api_endpoints": [
+        "POST /v1/apps/{id}/deploy-intents/managed"
+      ],
       "test_plan": [
         "Lifecycle transition tests",
         "Duplicate intent request test"
@@ -330,7 +389,9 @@
         "Bundle includes schema and data versions",
         "Unsupported fields are explicitly reported"
       ],
-      "api_endpoints": ["POST /v1/migration/violet/export"],
+      "api_endpoints": [
+        "POST /v1/migration/violet/export"
+      ],
       "test_plan": [
         "Fixture export tests from sampled Violet payloads",
         "Unsupported field behavior tests"
@@ -348,13 +409,18 @@
       "appetite_days": 4,
       "problem": "Import path must be safe and deterministic when encountering partial incompatibility.",
       "objective": "Ingest export bundles into new model with strict validation and deterministic reject paths.",
-      "dependencies": ["R1-014", "R1-008"],
+      "dependencies": [
+        "R1-014",
+        "R1-008"
+      ],
       "acceptance_criteria": [
         "Importer validates bundle version compatibility",
         "Import errors include field-level diagnostics",
         "Partial apply is disabled by default"
       ],
-      "api_endpoints": ["POST /v1/migration/violet/import"],
+      "api_endpoints": [
+        "POST /v1/migration/violet/import"
+      ],
       "test_plan": [
         "Roundtrip export/import test",
         "Compatibility mismatch test"
@@ -372,13 +438,22 @@
       "appetite_days": 3,
       "problem": "Agent workflows need clear API choreography for plan/act/verify/deploy loops.",
       "objective": "Publish and implement orchestrator endpoints with deterministic event traces.",
-      "dependencies": ["R1-009", "R1-010", "R1-012", "R1-013"],
+      "dependencies": [
+        "R1-009",
+        "R1-010",
+        "R1-012",
+        "R1-013"
+      ],
       "acceptance_criteria": [
         "Plan endpoint returns action graph with stable IDs",
         "Act endpoint executes one action with idempotency",
         "Verify endpoint links to deterministic check outputs"
       ],
-      "api_endpoints": ["POST /v1/agent/plan", "POST /v1/agent/act", "POST /v1/agent/verify"],
+      "api_endpoints": [
+        "POST /v1/agent/plan",
+        "POST /v1/agent/act",
+        "POST /v1/agent/verify"
+      ],
       "test_plan": [
         "Agent loop integration test",
         "Replay test for agent action graph"
@@ -396,13 +471,22 @@
       "appetite_days": 2,
       "problem": "Contract definition currently only covers scaffold endpoints.",
       "objective": "Expand OpenAPI document with all R1 endpoint schemas and error models.",
-      "dependencies": ["R1-008", "R1-009", "R1-010", "R1-012", "R1-013", "R1-016"],
+      "dependencies": [
+        "R1-008",
+        "R1-009",
+        "R1-010",
+        "R1-012",
+        "R1-013",
+        "R1-016"
+      ],
       "acceptance_criteria": [
         "OpenAPI includes request/response models for R1 endpoints",
         "Error model is consistent across endpoints",
         "Contract examples are present for agent consumers"
       ],
-      "api_endpoints": ["all R1 endpoints"],
+      "api_endpoints": [
+        "all R1 endpoints"
+      ],
       "test_plan": [
         "Schema lint checks",
         "Contract example validation"
@@ -420,13 +504,20 @@
       "appetite_days": 3,
       "problem": "No objective evidence yet for latency/reliability targets.",
       "objective": "Run controlled load tests and capture p95/p99/error metrics for release gate.",
-      "dependencies": ["R1-005", "R1-006", "R1-001"],
+      "dependencies": [
+        "R1-005",
+        "R1-006",
+        "R1-001"
+      ],
       "acceptance_criteria": [
         "p95 and p99 latency reports generated",
         "Error rate under expected load is measured",
         "Results archived in release artifacts"
       ],
-      "api_endpoints": ["POST /v1/decisions", "POST /v1/replay"],
+      "api_endpoints": [
+        "POST /v1/decisions",
+        "POST /v1/replay"
+      ],
       "test_plan": [
         "Synthetic load test scenario A",
         "Synthetic load test scenario B"
@@ -444,13 +535,18 @@
       "appetite_days": 2,
       "problem": "Agent-executed workflows widen attack surface without explicit threat model.",
       "objective": "Document and validate threat model for auth, tenancy, secrets, and replay abuse.",
-      "dependencies": ["R1-003", "R1-016"],
+      "dependencies": [
+        "R1-003",
+        "R1-016"
+      ],
       "acceptance_criteria": [
         "Threat model document reviewed",
         "High-severity findings assigned and mitigated or waived",
         "Release gate security signoff recorded"
       ],
-      "api_endpoints": ["all mutating endpoints"],
+      "api_endpoints": [
+        "all mutating endpoints"
+      ],
       "test_plan": [
         "Abuse-case walkthrough",
         "Auth bypass regression tests"
@@ -468,7 +564,10 @@
       "appetite_days": 2,
       "problem": "Execution quality degrades without a complete release handoff and operations guide.",
       "objective": "Produce final handoff packet with board, milestones, runbooks, and escalation paths.",
-      "dependencies": ["R1-018", "R1-019"],
+      "dependencies": [
+        "R1-018",
+        "R1-019"
+      ],
       "acceptance_criteria": [
         "Handoff document references all release artifacts",
         "Runbook includes rollback and incident procedures",
@@ -492,7 +591,13 @@
       "appetite_days": 4,
       "problem": "Generated output is deterministic and inspectable, but still perceived as scaffold-level versus template-grade baselines due to contract drift, shallow domain runtime depth, and unresolved migration/readiness gates.",
       "objective": "Adopt and execute a single branch decision tree (platform-first vs template-first), close UI/API contract drift, and gate advancement on measurable production-like evidence.",
-      "dependencies": ["R1-008", "R1-010", "R1-017", "R1-018", "R1-019"],
+      "dependencies": [
+        "R1-008",
+        "R1-010",
+        "R1-017",
+        "R1-018",
+        "R1-019"
+      ],
       "acceptance_criteria": [
         "Decision-tree branch is selected and documented with cut/no-cut policy",
         "Web UI and API contracts align for plan/clarify/studio responses",
@@ -525,7 +630,10 @@
       "appetite_days": 6,
       "problem": "Violet Rails ships built-in CMS, blog, forum, and email capabilities. VDA has zero endpoints or handler code for content management, threaded discussions, or email operations. Users migrating from Violet lose core product modules.",
       "objective": "Decide whether to generate product modules via Studio, build native API surface, or defer with explicit migration guidance. Document architectural boundary.",
-      "dependencies": ["R1-021", "R1-008"],
+      "dependencies": [
+        "R1-021",
+        "R1-008"
+      ],
       "acceptance_criteria": [
         "Inventory of most-used Violet product primitives completed",
         "Studio generation includes CMS/blog/forum module templates OR explicit deferral documented",
@@ -551,14 +659,19 @@
       "appetite_days": 5,
       "problem": "VDA's mutation model supports only 4 hardcoded classes (set_name, set_plan, set_region, set_feature_flag) versus Violet Rails' dynamic namespace/resource/action routing that allows arbitrary resource CRUD at runtime.",
       "objective": "Evaluate schema-driven mutation expansion versus accepting the constraint as an architectural boundary where rich data operations live in generated app runtime, not VDA control plane.",
-      "dependencies": ["R1-009", "R1-021"],
+      "dependencies": [
+        "R1-009",
+        "R1-021"
+      ],
       "acceptance_criteria": [
         "Most-used Violet resource types and action patterns inventoried",
         "Architectural boundary documented: control-plane mutations vs generated-app data operations",
         "Studio-generated apps produce self-sufficient CRUD for declared data_entities",
         "Option A (schema-driven mutations) technical feasibility evaluated for R2"
       ],
-      "api_endpoints": ["POST /v1/apps/{id}/mutations"],
+      "api_endpoints": [
+        "POST /v1/apps/{id}/mutations"
+      ],
       "test_plan": [
         "Generated app CRUD covers confirmation data_entities",
         "Mutation audit trail complete for all 4 classes"
@@ -577,7 +690,11 @@
       "appetite_days": 6,
       "problem": "Studio verification checks are structural (schema/policy/deploy_preflight), not behavioral. Generated apps compile and render but lack tested domain logic. JTBD coverage checks for scenario presence, not execution.",
       "objective": "Evolve verification from structural checks to behavioral assertions. Generate test fixtures alongside code artifacts. Add depth labeling (prototype/pilot/production-candidate).",
-      "dependencies": ["R1-010", "R1-011", "R1-021"],
+      "dependencies": [
+        "R1-010",
+        "R1-011",
+        "R1-021"
+      ],
       "acceptance_criteria": [
         "Behavioral check categories defined beyond structural (unit, integration, e2e)",
         "Generated test fixtures included in Studio output",
@@ -609,7 +726,11 @@
       "appetite_days": 5,
       "problem": "VDA has strong request-level tenant auth (token-based) but no user registration, login, password reset, invitation, role assignment, admin consoles, or subdomain governance. Generated apps cannot authenticate end-users.",
       "objective": "Generate auth modules as part of Studio output (session/JWT/OAuth from confirmation metadata). Document separation of control-plane auth from generated-app auth.",
-      "dependencies": ["R1-003", "R1-019", "R1-021"],
+      "dependencies": [
+        "R1-003",
+        "R1-019",
+        "R1-021"
+      ],
       "acceptance_criteria": [
         "Studio generates auth module from confirmation metadata",
         "Generated RBAC model derived from primary_users and constraints",
@@ -636,7 +757,11 @@
       "appetite_days": 8,
       "problem": "POST /v1/migration/violet/export and POST /v1/migration/violet/import are documented as required gates in EXTRACTION_ROADMAP and DEPRECATION_PLAN but have no handler code, no route registration, and no implementation. R1-014 and R1-015 remain in uphill with no progress toward code.",
       "objective": "Implement both migration endpoints with roundtrip fidelity, golden fixture validation, and reject-safe semantics. Unblock deprecation timeline.",
-      "dependencies": ["R1-014", "R1-015", "R1-008"],
+      "dependencies": [
+        "R1-014",
+        "R1-015",
+        "R1-008"
+      ],
       "acceptance_criteria": [
         "POST /v1/migration/violet/export handler implemented",
         "POST /v1/migration/violet/import handler implemented",
@@ -657,6 +782,188 @@
       ],
       "done_definition": "Both endpoints implemented with passing roundtrip test suite; deprecation timeline unblocked",
       "github_issue": 8
+    },
+    {
+      "id": "R1-027",
+      "title": "Incident closure: verification verdict must gate on runtime run-all",
+      "scope": "S4",
+      "type": "risk",
+      "priority": "P0",
+      "status": "uphill",
+      "owner_role": "qa-platform",
+      "appetite_days": 3,
+      "problem": "A Studio job can report verification pass from structural checks while runtime run-all fails for the same revision (incident #13).",
+      "objective": "Bind verification truth to latest runtime run-all evidence and prevent false-positive readiness verdicts.",
+      "dependencies": [
+        "R1-021",
+        "R1-024"
+      ],
+      "acceptance_criteria": [
+        "verification_report includes runtime evidence linkage for the same job revision",
+        "verification verdict cannot be pass when latest run target=all is fail or missing",
+        "verification payload clearly reports pending/failed runtime execution state",
+        "incident #13 closure evidence attached"
+      ],
+      "api_endpoints": [
+        "POST /v1/studio/jobs/{id}/run",
+        "GET /v1/studio/jobs/{id}/verification"
+      ],
+      "test_plan": [
+        "Regression test: structural checks pass but runtime fail must yield verification fail",
+        "Golden fixture test proving verdict alignment after run-all pass"
+      ],
+      "done_definition": "Verification report truthfully reflects runtime readiness and cannot drift from run-all results",
+      "github_issue": 13
+    },
+    {
+      "id": "R1-028",
+      "title": "Runtime smoke probes must derive entities from generated spec",
+      "scope": "S4",
+      "type": "feature",
+      "priority": "P0",
+      "status": "uphill",
+      "owner_role": "qa-platform",
+      "appetite_days": 2,
+      "problem": "Runtime smoke currently probes /v1/entities/account/records regardless of generated entities, creating false failures.",
+      "objective": "Use generated entity set when probing entity runtime endpoints and remove hardcoded domain assumptions.",
+      "dependencies": [
+        "R1-027"
+      ],
+      "acceptance_criteria": [
+        "runGeneratedAPIRuntimeChecks chooses probe entity from generated entities",
+        "non-account entity jobs pass entity runtime smoke when runtime is healthy",
+        "fallback behavior is explicit when no entities are generated"
+      ],
+      "api_endpoints": [
+        "POST /v1/studio/jobs/{id}/run"
+      ],
+      "test_plan": [
+        "Unit test for probe entity derivation",
+        "Integration run target=all for job with custom entities"
+      ],
+      "done_definition": "Entity runtime smoke checks are schema-aware and deterministic"
+    },
+    {
+      "id": "R1-029",
+      "title": "Generate route-complete OpenAPI for generated runtime",
+      "scope": "S3",
+      "type": "enabler",
+      "priority": "P0",
+      "status": "uphill",
+      "owner_role": "api-dx",
+      "appetite_days": 4,
+      "problem": "Generated OpenAPI currently covers only health and workflow execute, while runtime serves broader entities/actions/primitives/identity routes.",
+      "objective": "Emit generated OpenAPI that matches generated runtime route surface and add parity assertions.",
+      "dependencies": [
+        "R1-017",
+        "R1-027"
+      ],
+      "acceptance_criteria": [
+        "Generated OpenAPI includes entities, actions, tools, primitives, and identity routes",
+        "Route parity assertion test fails on missing/mismatched paths",
+        "Verification report includes spec/runtime parity check"
+      ],
+      "api_endpoints": [
+        "GET /v1/studio/jobs/{id}/artifacts",
+        "GET /v1/studio/jobs/{id}/verification"
+      ],
+      "test_plan": [
+        "Generated fixture diff between runtime route table and OpenAPI paths",
+        "Contract lint on generated OpenAPI artifacts"
+      ],
+      "done_definition": "Generated OpenAPI is route-complete and parity-tested"
+    },
+    {
+      "id": "R1-030",
+      "title": "Behavioral depth uplift for generated primitives and identity",
+      "scope": "S3",
+      "type": "feature",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "owner_role": "platform",
+      "appetite_days": 6,
+      "problem": "Generated primitives/identity modules are largely seeded stubs and do not meet template-grade behavioral depth expectations.",
+      "objective": "Move generated primitives and identity from seeded placeholders to stateful behavioral modules with executable flows.",
+      "dependencies": [
+        "R1-027",
+        "R1-028",
+        "R1-029"
+      ],
+      "acceptance_criteria": [
+        "Generated primitives include write/read lifecycle behaviors",
+        "Generated identity includes session + invite + role workflows with deterministic fixtures",
+        "Behavioral tests validate end-to-end module flows"
+      ],
+      "api_endpoints": [
+        "generated runtime /v1/primitives/*",
+        "generated runtime /v1/identity/*"
+      ],
+      "test_plan": [
+        "Behavioral fixture runs for primitives and identity flows",
+        "Generated web/mobile artifacts exercise the new module states"
+      ],
+      "done_definition": "Generated runtime modules demonstrate behavioral depth beyond seeded static responses"
+    },
+    {
+      "id": "R1-031",
+      "title": "Workspace visibility and artifact export clarity for Studio jobs",
+      "scope": "S4",
+      "type": "enabler",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "owner_role": "platform",
+      "appetite_days": 3,
+      "problem": "When Studio runs in containerized environments, generated workspace paths can appear missing from host context, creating a vaporware perception.",
+      "objective": "Make workspace visibility explicit and ensure predictable artifact retrieval from host/operator workflows.",
+      "dependencies": [
+        "R1-027"
+      ],
+      "acceptance_criteria": [
+        "Studio responses clearly indicate materialization location and retrieval path",
+        "Bundle/export path is documented and validated for operator flow",
+        "Operator docs include host vs container workspace semantics"
+      ],
+      "api_endpoints": [
+        "GET /v1/studio/jobs/{id}",
+        "GET /v1/studio/jobs/{id}/bundle"
+      ],
+      "test_plan": [
+        "Containerized demo validation for workspace discoverability",
+        "Artifact retrieval walkthrough from operator UI and CLI"
+      ],
+      "done_definition": "Operators can deterministically locate or retrieve generated artifacts without ambiguity"
+    },
+    {
+      "id": "R1-032",
+      "title": "Parity benchmark gate and scorecard for Violet Rails-level expectation",
+      "scope": "S4",
+      "type": "risk",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "owner_role": "platform",
+      "appetite_days": 4,
+      "problem": "Parity claims are currently interpreted qualitatively, leading to mismatch between delivered behavior and expected fullstack depth.",
+      "objective": "Define and enforce a measurable parity scorecard that gates release claims.",
+      "dependencies": [
+        "R1-027",
+        "R1-029",
+        "R1-030"
+      ],
+      "acceptance_criteria": [
+        "Parity matrix maps expectation -> endpoint/module -> executable evidence",
+        "Release gate defines minimum pass thresholds for structural and behavioral categories",
+        "Benchmark artifact is published in release packet"
+      ],
+      "api_endpoints": [
+        "POST /v1/studio/jobs/{id}/run",
+        "GET /v1/studio/jobs/{id}/verification",
+        "GET /v1/studio/jobs/{id}/jtbd"
+      ],
+      "test_plan": [
+        "Benchmark run across representative generated app fixtures",
+        "Scorecard regression check in CI"
+      ],
+      "done_definition": "Release claims reference quantified parity evidence instead of narrative-only status"
     }
   ]
 }

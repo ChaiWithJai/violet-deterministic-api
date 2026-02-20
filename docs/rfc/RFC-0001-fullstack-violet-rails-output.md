@@ -258,6 +258,17 @@ The correct framing: VDA is a **deterministic build/deploy engine**, not a dynam
 | RISK-007 | Scaffold-level depth undermines credibility | High | Generated job passes behavioral JTBD scenarios |
 | RISK-008 | Migration endpoint absence blocks deprecation | Critical | Roundtrip export→import→export produces identical bundles |
 
+## 15) Incident Addendum: Verification Truth Gap (2026-02-20)
+
+Incident `INC-2026-02-20-studio-verification-truth-gap` (GitHub #13) exposed a release-critical mismatch: Studio verification reported `pass` while runtime `run target=all` failed for the same job revision.
+
+The closure path is defined in:
+1. `docs/rfc/RFC-0002-studio-verification-truth-and-parity-delivery.md`
+2. `planning/release-r1/tickets.json` tickets `R1-027` through `R1-032`
+3. `planning/release-r1/risk-register.json` risks `RISK-009` through `RISK-011`
+
+This addendum supersedes any interpretation that structural artifact presence alone is sufficient for a parity-grade verification `pass`.
+
 ### 14.5 Board Impact
 
 - **R1-024** (depth) and **R1-026** (migration) added to **Uphill** — these are P0 blockers.

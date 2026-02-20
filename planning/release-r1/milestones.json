@@ -28,7 +28,9 @@
       "gates": [
         "App blueprint APIs available",
         "Verify endpoint returns machine-readable assertions",
-        "Agent contract examples pass"
+        "Agent contract examples pass",
+        "Studio verification verdicts are aligned with same-revision run target=all evidence",
+        "Generated runtime OpenAPI route parity checks pass"
       ]
     },
     {
@@ -38,7 +40,8 @@
       "gates": [
         "Replay mismatch <= 0.5% on fixture suite",
         "p95 latency target satisfied in controlled load run",
-        "Self-host and managed punchout contracts documented"
+        "Self-host and managed punchout contracts documented",
+        "Parity benchmark scorecard published with release packet"
       ]
     }
   ]

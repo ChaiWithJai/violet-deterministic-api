@@ -64,6 +64,30 @@
       "owner_role": "migration",
       "mitigation": "Implement export/import endpoints (R1-014/R1-015) with roundtrip fidelity tests",
       "exit_criteria": "Roundtrip export->import->export produces identical bundles on golden fixtures"
+    },
+    {
+      "id": "RISK-009",
+      "title": "Verification false-positive pass undermines release trust",
+      "severity": "critical",
+      "owner_role": "qa-platform",
+      "mitigation": "Gate verification verdict on latest same-revision run target=all evidence",
+      "exit_criteria": "0 cases where verification pass coexists with run-all fail/missing in release fixtures"
+    },
+    {
+      "id": "RISK-010",
+      "title": "Hardcoded runtime probe assumptions create entity-dependent failures",
+      "severity": "high",
+      "owner_role": "qa-platform",
+      "mitigation": "Derive runtime smoke probes from generated entity/workflow spec",
+      "exit_criteria": "Entity smoke checks pass across fixture set without hardcoded entity names"
+    },
+    {
+      "id": "RISK-011",
+      "title": "Generated OpenAPI and runtime route drift causes parity misreporting",
+      "severity": "high",
+      "owner_role": "api-dx",
+      "mitigation": "Generate route-complete OpenAPI and enforce route/spec parity tests in CI",
+      "exit_criteria": "100% route parity across generated runtime fixtures"
     }
   ]
 }

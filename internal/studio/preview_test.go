@@ -96,8 +96,18 @@ func TestCreateJobEnforcesDeterministicPolicyConstraints(t *testing.T) {
 	if !hasConstraint(job.Confirmation.Constraints, "no_runtime_eval") {
 		t.Fatalf("expected no_runtime_eval constraint to be enforced")
 	}
-	if job.Verification.Verdict != "pass" {
-		t.Fatalf("expected verification verdict pass, got %q", job.Verification.Verdict)
+	if job.Verification.Verdict != "fail" {
+		t.Fatalf("expected verification verdict fail before run-all evidence, got %q", job.Verification.Verdict)
+	}
+	gateStatus := ""
+	for _, check := range job.Verification.Checks {
+		if check.ID == "runtime_run_all_gate" {
+			gateStatus = check.Status
+			break
+		}
+	}
+	if gateStatus != "fail" {
+		t.Fatalf("expected runtime_run_all_gate to fail before run-all evidence, got %q", gateStatus)
 	}
 }
 
@@ -140,12 +150,12 @@ func TestCreateJobIncludesBackendRuntimeArtifacts(t *testing.T) {
 		}
 	}
 
-	result, found := svc.RunTarget("t_acme", job.JobID, "api")
+	result, found := svc.RunTarget("t_acme", job.JobID, "all")
 	if !found {
-		t.Fatalf("expected run target api to find job")
+		t.Fatalf("expected run target all to find job")
 	}
 	if result.Status != "pass" {
-		t.Fatalf("expected api run target pass, got %q", result.Status)
+		t.Fatalf("expected all run target pass, got %q", result.Status)
 	}
 	ids := map[string]string{}
 	for _, check := range result.Checks {
@@ -172,11 +182,52 @@ func TestCreateJobIncludesBackendRuntimeArtifacts(t *testing.T) {
 	if ids["api_runtime_identity"] != "pass" {
 		t.Fatalf("expected api_runtime_identity pass, got %q", ids["api_runtime_identity"])
 	}
+	updated, ok := svc.GetJob("t_acme", job.JobID)
+	if !ok {
+		t.Fatalf("expected updated job after run-all")
+	}
+	if updated.Verification.Verdict != "pass" {
+		t.Fatalf("expected verification verdict pass after run-all evidence, got %q", updated.Verification.Verdict)
+	}
+	gateStatus := ""
+	for _, check := range updated.Verification.Checks {
+		if check.ID == "runtime_run_all_gate" {
+			gateStatus = check.Status
+			break
+		}
+	}
+	if gateStatus != "pass" {
+		t.Fatalf("expected runtime_run_all_gate pass after run-all, got %q", gateStatus)
+	}
 	if job.DepthLabel != "pilot" {
 		t.Fatalf("expected default depth label pilot, got %q", job.DepthLabel)
 	}
-	if job.Verification.BehavioralPassRate < 1 {
-		t.Fatalf("expected behavioral pass rate >= 1, got %f", job.Verification.BehavioralPassRate)
+	if updated.Verification.BehavioralPassRate < 1 {
+		t.Fatalf("expected behavioral pass rate >= 1, got %f", updated.Verification.BehavioralPassRate)
+	}
+}
+
+func TestRunTargetAllUsesGeneratedEntityProbe(t *testing.T) {
+	svc := NewService()
+	job := svc.CreateJob("t_acme", Confirmation{
+		Prompt:       "non account entities",
+		AppName:      "Entity Probe",
+		DataEntities: []string{"schema", "crud", "api"},
+	})
+
+	result, found := svc.RunTarget("t_acme", job.JobID, "all")
+	if !found {
+		t.Fatalf("expected run target all to find job")
+	}
+	if result.Status != "pass" {
+		t.Fatalf("expected run target all pass for generated entities, got %q", result.Status)
+	}
+	ids := map[string]string{}
+	for _, check := range result.Checks {
+		ids[check.ID] = check.Status
+	}
+	if ids["api_runtime_entity_records"] != "pass" {
+		t.Fatalf("expected api_runtime_entity_records pass, got %q", ids["api_runtime_entity_records"])
 	}
 }
 

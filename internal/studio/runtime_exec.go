@@ -56,7 +56,7 @@ func (s *Service) runGeneratedAPIRuntimeChecks(job Job) []VerificationCheck {
 		}}
 	}
 
-	smoke, runErr := runGeneratedServerChecks(ctx, serviceDir)
+	smoke, runErr := runGeneratedServerChecks(ctx, serviceDir, runtimeProbeEntity(job))
 	if runErr != nil {
 		return []VerificationCheck{
 			{
@@ -136,7 +136,7 @@ func runGoCommand(ctx context.Context, dir string, args ...string) (string, erro
 	return out.String(), err
 }
 
-func runGeneratedServerChecks(parent context.Context, dir string) (runtimeSmokeResult, error) {
+func runGeneratedServerChecks(parent context.Context, dir, probeEntity string) (runtimeSmokeResult, error) {
 	result := runtimeSmokeResult{}
 	port, err := reserveFreePort()
 	if err != nil {
@@ -191,7 +191,7 @@ func runGeneratedServerChecks(parent context.Context, dir string) (runtimeSmokeR
 			result.DepthLabelOK = depthLabelOK
 			result.ToolsOK = checkTools(baseURL)
 			result.WorkflowOK = checkWorkflowExecute(baseURL)
-			result.EntityRecordsOK = checkEntityRecords(baseURL)
+				result.EntityRecordsOK = checkEntityRecords(baseURL, probeEntity)
 			result.ActionExecuteOK = checkExecuteAction(baseURL)
 			result.PrimitivesCMSOK = checkPrimitivesCMS(baseURL)
 			result.IdentityRoutesOK = checkIdentityProviders(baseURL)
@@ -281,9 +281,13 @@ func checkWorkflowExecute(baseURL string) bool {
 	return bytes.Contains(body, []byte(`"accepted"`))
 }
 
-func checkEntityRecords(baseURL string) bool {
+func checkEntityRecords(baseURL, entity string) bool {
+	entity = strings.TrimSpace(strings.ToLower(entity))
+	if entity == "" {
+		entity = "account"
+	}
 	client := &http.Client{Timeout: 2 * time.Second}
-	resp, err := client.Get(baseURL + "/v1/entities/account/records")
+	resp, err := client.Get(baseURL + "/v1/entities/" + entity + "/records")
 	if err != nil {
 		return false
 	}
@@ -296,6 +300,16 @@ func checkEntityRecords(baseURL string) bool {
 		return false
 	}
 	return bytes.Contains(body, []byte(`"records"`))
+}
+
+func runtimeProbeEntity(job Job) string {
+	for _, candidate := range job.Confirmation.DataEntities {
+		candidate = strings.TrimSpace(strings.ToLower(candidate))
+		if candidate != "" {
+			return candidate
+		}
+	}
+	return "account"
 }
 
 func checkExecuteAction(baseURL string) bool {

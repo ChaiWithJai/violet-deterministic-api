@@ -12,6 +12,7 @@ Shape, bet, and execute the first deterministic release for the SaaS-building AP
 6. `no-gos-and-risks.md` — out-of-bounds list + known risks.
 7. `kickoff-message.md` — message template and actual kickoff payload.
 8. `cooldown-plan.md` — hardening and shaping work for cooldown.
+9. `parity-delivery-plan.md` — post-incident parity closure tree and cut policy.
 
 ## Source references
 1. Shape Up PDF: `/Users/jaibhagat/Downloads/shape-up.pdf`
