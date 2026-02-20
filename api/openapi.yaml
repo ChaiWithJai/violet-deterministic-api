@@ -147,6 +147,129 @@ components:
           items:
             type: object
             additionalProperties: true
+    VioletResource:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+        records:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    VioletAction:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        resource:
+          type: string
+        type:
+          type: string
+        config:
+          type: object
+          additionalProperties: true
+    VioletBundle:
+      type: object
+      required: [bundle_id, source_system, bundle_version, policy_version, data_version, namespace, resources, checksum]
+      properties:
+        bundle_id:
+          type: string
+        source_system:
+          type: string
+        bundle_version:
+          type: string
+        policy_version:
+          type: string
+        data_version:
+          type: string
+        namespace:
+          type: string
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/VioletResource'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/VioletAction'
+        roles:
+          type: array
+          items:
+            type: string
+        unsupported_fields:
+          type: array
+          items:
+            type: string
+        checksum:
+          type: string
+    VioletExportRequest:
+      type: object
+      properties:
+        app_id:
+          type: string
+        namespace:
+          type: string
+        bundle_version:
+          type: string
+        source:
+          type: object
+          additionalProperties: true
+    VioletExportResponse:
+      type: object
+      properties:
+        bundle:
+          $ref: '#/components/schemas/VioletBundle'
+        counts:
+          type: object
+          properties:
+            resources:
+              type: integer
+            actions:
+              type: integer
+            roles:
+              type: integer
+    VioletImportRequest:
+      type: object
+      required: [bundle]
+      properties:
+        app_id:
+          type: string
+        allow_partial:
+          type: boolean
+        bundle:
+          $ref: '#/components/schemas/VioletBundle'
+    VioletImportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        app:
+          type: object
+          additionalProperties: true
+        bundle_id:
+          type: string
+        checksum:
+          type: string
+        unsupported_fields:
+          type: array
+          items:
+            type: string
+        imported_counts:
+          type: object
+          properties:
+            resources:
+              type: integer
+            actions:
+              type: integer
+            roles:
+              type: integer
 paths:
   /v1/health:
     get:
@@ -364,6 +487,60 @@ paths:
       responses:
         '202':
           description: Deploy intent accepted
+
+  /v1/migration/violet/export:
+    post:
+      summary: Export Violet namespace/resource/action payload into deterministic migration bundle
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VioletExportRequest'
+      responses:
+        '200':
+          description: Normalized migration bundle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletExportResponse'
+        '400':
+          description: Invalid export request
+        '404':
+          description: App not found
+
+  /v1/migration/violet/import:
+    post:
+      summary: Import deterministic migration bundle into app blueprint
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VioletImportRequest'
+      responses:
+        '200':
+          description: Imported into existing app
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletImportResponse'
+        '201':
+          description: Imported and created new app
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletImportResponse'
+        '400':
+          description: Invalid import request or bundle
+        '404':
+          description: Target app not found
 
   /v1/llm/providers:
     get:

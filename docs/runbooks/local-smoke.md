@@ -221,3 +221,31 @@
 
 ### Observed contract risk (follow-up)
 1. `POST /v1/replay` runtime payload currently does not include `hashes_match`, while `web/src/lib/api/types.ts` still expects it in `ReplayResponse`.
+
+## Verification evidence (2026-02-20 UTC, migration parity endpoint pass)
+
+### Machine context
+1. Timestamp: `2026-02-20T04:10:38Z`
+2. Kernel: `Darwin 25.2.0 arm64`
+3. Docker: `28.0.1`, Compose: `v2.33.1-desktop.1`
+
+### Mandatory platform checks
+1. `docker compose -f docker-compose.demo.yml config` -> PASS.
+2. `docker compose -f docker-compose.demo.yml up -d --build api` -> PASS.
+3. `GET /v1/health` (bearer auth) -> PASS (`200`).
+4. Determinism checks:
+   - `POST /v1/decisions` with stable idempotency remains pass under current branch build.
+   - `POST /v1/replay` returns persisted payload for decision IDs in tenant scope.
+
+### Migration endpoint checks
+1. `POST /v1/migration/violet/export` -> PASS (`200`) with deterministic bundle payload.
+2. Export response includes explicit `unsupported_fields` paths for non-supported source keys:
+   - `actions[0].legacy_action_option`
+   - `ignored_top_level`
+   - `resources[0].legacy_flag`
+3. `POST /v1/migration/violet/import` with `Idempotency-Key` and exported bundle -> PASS (`201`), app created (`app_d85c129425cc7e46`).
+4. `POST /v1/migration/violet/import` with `allow_partial=true` -> PASS (`400 partial_apply_disabled` reject-safe behavior).
+5. Roundtrip parity:
+   - export checksum: `a954d9e4182d8a1f4c636acd57c02f23c73c0a29678930716d2cd23a465947ad`
+   - re-export checksum after import: `a954d9e4182d8a1f4c636acd57c02f23c73c0a29678930716d2cd23a465947ad`
+   - `export -> import -> export` bundle equality: `PASS`.
