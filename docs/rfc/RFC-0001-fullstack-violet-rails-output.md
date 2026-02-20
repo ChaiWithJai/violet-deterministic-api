@@ -264,6 +264,16 @@ The correct framing: VDA is a **deterministic build/deploy engine**, not a dynam
 - **R1-022** (primitives), **R1-023** (mutation model), **R1-025** (auth governance) added to **Bet Accepted** — P1, scoped for current cycle with cut option.
 - Circuit breaker rule remains: if S1/S2 unknowns unresolved by 2026-03-13, cut S5/S6 breadth.
 
+### 14.6 Implementation Update (2026-02-20)
+
+The selected path for all five shortfalls is now implemented in code with deterministic boundaries preserved:
+
+1. **R1-022 (primitives):** Studio now generates CMS/blog/forum/email runtime modules and parity docs.
+2. **R1-023 (dynamic model):** Studio-generated runtime now exposes entity CRUD and action execution (`/v1/entities/{entity}/records`, `/v1/actions/execute`) while keeping control-plane mutations constrained.
+3. **R1-024 (depth):** Studio now emits behavioral fixtures, depth labels (`prototype`/`pilot`/`production-candidate`), and runtime behavioral checks.
+4. **R1-025 (user lifecycle):** Studio now generates identity lifecycle routes plus Auth0/Clerk/Supabase provider stubs and RBAC model artifacts.
+5. **R1-026 (migration):** Violet export/import parity endpoints are implemented with roundtrip validation.
+
 ---
 
-**Bottom line:** POC validated direction; this RFC changes success criteria from "generated something" to "generated a runnable, verifiable, deployable fullstack app that satisfies explicit JTBDs." The parity analysis confirms: VDA's deterministic core is materially implemented, but five shortfall areas must be addressed — either by building, generating, or explicitly deferring — before "replace Violet Rails" is credible.
+**Bottom line:** POC validated direction; this RFC changes success criteria from "generated something" to "generated a runnable, verifiable, deployable fullstack app that satisfies explicit JTBDs." The parity analysis now maps to implemented execution paths in Studio/runtime while preserving the deterministic control-plane boundary.

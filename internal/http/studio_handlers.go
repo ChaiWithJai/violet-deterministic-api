@@ -23,6 +23,7 @@ type studioCreateJobRequest struct {
 	DeploymentTarget string   `json:"deployment_target"`
 	Region           string   `json:"region"`
 	Plan             string   `json:"plan"`
+	GenerationDepth  string   `json:"generation_depth"`
 	Integrations     []string `json:"integrations"`
 	Constraints      []string `json:"constraints"`
 }
@@ -63,6 +64,7 @@ func (s *Server) handleStudioCreateJob(w httpstd.ResponseWriter, r *httpstd.Requ
 			DeploymentTarget: req.DeploymentTarget,
 			Region:           req.Region,
 			Plan:             req.Plan,
+			GenerationDepth:  req.GenerationDepth,
 			Integrations:     normalizeList(req.Integrations),
 			Constraints:      normalizeList(req.Constraints),
 		})

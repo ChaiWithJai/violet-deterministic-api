@@ -713,6 +713,9 @@ func applyPromptDefaultsForClarify(conf *studioCreateJobRequest, prompt string) 
 	if strings.TrimSpace(conf.Plan) == "" {
 		conf.Plan = "starter"
 	}
+	if strings.TrimSpace(conf.GenerationDepth) == "" {
+		conf.GenerationDepth = "pilot"
+	}
 	if strings.TrimSpace(conf.Region) == "" {
 		conf.Region = "us-east-1"
 	}
@@ -775,6 +778,11 @@ func applyClarifyAnswers(conf *studioCreateJobRequest, answers map[string]string
 				conf.Plan = strings.ToLower(value)
 			default:
 				conf.Plan = value
+			}
+		case "generation_depth":
+			switch strings.ToLower(value) {
+			case "prototype", "pilot", "production-candidate":
+				conf.GenerationDepth = strings.ToLower(value)
 			}
 		case "region":
 			conf.Region = value
@@ -928,6 +936,8 @@ func canonicalClarifyField(field string) string {
 		return "source_system"
 	case "plan", "tier":
 		return "plan"
+	case "depth", "generation_depth":
+		return "generation_depth"
 	case "region":
 		return "region"
 	case "deployment", "deployment_target", "target", "hosting":

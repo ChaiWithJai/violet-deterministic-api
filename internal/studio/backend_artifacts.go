@@ -70,6 +70,7 @@ func main() {
 		Domain:     %q,
 		Plan:       %q,
 		Region:     %q,
+		DepthLabel: %q,
 		Users:      %s,
 		Entities:   %s,
 		Workflows:  %s,
@@ -87,32 +88,36 @@ func main() {
 		log.Fatal(fmt.Errorf("listen %%s: %%w", addr, err))
 	}
 }
-`, module, module, appName, domain, fallback(conf.Plan, "starter"), fallback(conf.Region, "us-east-1"), userList, entityList, workflowList)
+`, module, module, appName, domain, fallback(conf.Plan, "starter"), fallback(conf.Region, "us-east-1"), normalizeDepthLabel(conf.GenerationDepth), userList, entityList, workflowList)
 
-	runtimeServer := `package runtime
+	runtimeServer := fmt.Sprintf(`package runtime
 
 import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"%s/internal/identity"
+	"%s/internal/primitives"
 )
 
 type Spec struct {
-	AppName    string   ` + "`json:\"app_name\"`" + `
-	Domain     string   ` + "`json:\"domain\"`" + `
-	Plan       string   ` + "`json:\"plan\"`" + `
-	Region     string   ` + "`json:\"region\"`" + `
-	Users      []string ` + "`json:\"users\"`" + `
-	Entities   []string ` + "`json:\"entities\"`" + `
-	Workflows  []string ` + "`json:\"workflows\"`" + `
-	ToolRoutes []Tool   ` + "`json:\"tool_routes\"`" + `
+	AppName    string   `+"`json:\"app_name\"`"+`
+	Domain     string   `+"`json:\"domain\"`"+`
+	Plan       string   `+"`json:\"plan\"`"+`
+	Region     string   `+"`json:\"region\"`"+`
+	DepthLabel string   `+"`json:\"depth_label\"`"+`
+	Users      []string `+"`json:\"users\"`"+`
+	Entities   []string `+"`json:\"entities\"`"+`
+	Workflows  []string `+"`json:\"workflows\"`"+`
+	ToolRoutes []Tool   `+"`json:\"tool_routes\"`"+`
 }
 
 type Tool struct {
-	Name        string ` + "`json:\"name\"`" + `
-	Method      string ` + "`json:\"method\"`" + `
-	Path        string ` + "`json:\"path\"`" + `
-	Description string ` + "`json:\"description\"`" + `
+	Name        string `+"`json:\"name\"`"+`
+	Method      string `+"`json:\"method\"`"+`
+	Path        string `+"`json:\"path\"`"+`
+	Description string `+"`json:\"description\"`"+`
 }
 
 type Server struct {
@@ -138,15 +143,24 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("/v1/tools", s.handleTools)
 	s.mux.HandleFunc("/v1/workflows/execute", s.handleExecuteWorkflow)
 	s.mux.HandleFunc("/v1/entities", s.handleEntities)
+	s.mux.HandleFunc("/v1/entities/", s.handleEntityRecordOps)
+	s.mux.HandleFunc("/v1/actions/execute", s.handleExecuteAction)
+
+	identity.RegisterRoutes(s.mux, identity.Config{
+		PrimaryUsers: s.spec.Users,
+		Constraints:  []string{"all_mutations_idempotent"},
+	})
+	primitives.RegisterRoutes(s.mux)
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
-		"status":     "ok",
-		"app_name":   s.spec.AppName,
-		"domain":     s.spec.Domain,
-		"generated":  true,
-		"checked_at": time.Now().UTC().Format(time.RFC3339),
+		"status":      "ok",
+		"app_name":    s.spec.AppName,
+		"domain":      s.spec.Domain,
+		"generated":   true,
+		"checked_at":  time.Now().UTC().Format(time.RFC3339),
+		"depth_label": s.spec.DepthLabel,
 	})
 }
 
@@ -159,17 +173,17 @@ func (s *Server) handleTools(w http.ResponseWriter, _ *http.Request) {
 
 func (s *Server) handleExecuteWorkflow(w http.ResponseWriter, r *http.Request) {
 	type request struct {
-		Workflow string         ` + "`json:\"workflow\"`" + `
-		Input    map[string]any ` + "`json:\"input\"`" + `
+		Workflow string         `+"`json:\"workflow\"`"+`
+		Input    map[string]any `+"`json:\"input\"`"+`
 	}
 	var req request
 	_ = json.NewDecoder(r.Body).Decode(&req)
 	writeJSON(w, http.StatusOK, map[string]any{
-		"workflow":  req.Workflow,
-		"status":    "accepted",
+		"workflow":   req.Workflow,
+		"status":     "accepted",
 		"idempotent": true,
-		"input":     req.Input,
-		"timestamp": time.Now().UTC().Format(time.RFC3339),
+		"input":      req.Input,
+		"timestamp":  time.Now().UTC().Format(time.RFC3339),
 	})
 }
 
@@ -186,7 +200,7 @@ func writeJSON(w http.ResponseWriter, status int, body any) {
 	w.WriteHeader(status)
 	_, _ = w.Write(payload)
 }
-`
+`, module, module)
 
 	toolsCatalog := fmt.Sprintf(`package tools
 
@@ -272,6 +286,420 @@ func TestHealthEndpoint(t *testing.T) {
 }
 `
 
+	runtimeEntityOps := `package runtime
+
+import (
+	"encoding/json"
+	"net/http"
+	"strings"
+	"time"
+)
+
+func (s *Server) handleEntityRecordOps(w http.ResponseWriter, r *http.Request) {
+	entity, resource := parseEntityPath(r.URL.Path)
+	if entity == "" || resource != "records" {
+		writeJSON(w, http.StatusNotFound, map[string]any{"error": "entity_route_not_found"})
+		return
+	}
+	if !s.isKnownEntity(entity) {
+		writeJSON(w, http.StatusNotFound, map[string]any{
+			"error":          "unknown_entity",
+			"entity":         entity,
+			"known_entities": s.spec.Entities,
+		})
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		writeJSON(w, http.StatusOK, map[string]any{
+			"entity": entity,
+			"records": []map[string]any{
+				{"id": entity + "-demo-1", "status": "seeded"},
+			},
+			"count": 1,
+		})
+	case http.MethodPost:
+		var payload map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&payload)
+		if payload == nil {
+			payload = map[string]any{}
+		}
+		payload["id"] = entity + "-draft"
+		payload["entity"] = entity
+		payload["created_at"] = time.Now().UTC().Format(time.RFC3339)
+		writeJSON(w, http.StatusCreated, map[string]any{
+			"entity": entity,
+			"record": payload,
+			"status": "created",
+		})
+	default:
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+	}
+}
+
+func (s *Server) handleExecuteAction(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+		return
+	}
+	type request struct {
+		Action  string         ` + "`json:\"action\"`" + `
+		Entity  string         ` + "`json:\"entity\"`" + `
+		Payload map[string]any ` + "`json:\"payload\"`" + `
+	}
+	var req request
+	_ = json.NewDecoder(r.Body).Decode(&req)
+	if strings.TrimSpace(req.Action) == "" {
+		req.Action = "custom_action"
+	}
+	if strings.TrimSpace(req.Entity) == "" && len(s.spec.Entities) > 0 {
+		req.Entity = s.spec.Entities[0]
+	}
+	if req.Payload == nil {
+		req.Payload = map[string]any{}
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"action":              req.Action,
+		"entity":              req.Entity,
+		"status":              "accepted",
+		"idempotent":          true,
+		"payload":             req.Payload,
+		"available_workflows": s.spec.Workflows,
+		"timestamp":           time.Now().UTC().Format(time.RFC3339),
+	})
+}
+
+func (s *Server) isKnownEntity(entity string) bool {
+	entity = strings.TrimSpace(strings.ToLower(entity))
+	for _, candidate := range s.spec.Entities {
+		if strings.TrimSpace(strings.ToLower(candidate)) == entity {
+			return true
+		}
+	}
+	return false
+}
+
+func parseEntityPath(path string) (string, string) {
+	parts := strings.Split(strings.Trim(path, "/"), "/")
+	if len(parts) < 4 {
+		return "", ""
+	}
+	if parts[0] != "v1" || parts[1] != "entities" {
+		return "", ""
+	}
+	return parts[2], parts[3]
+}
+`
+
+	runtimeBehaviorTest := `package runtime
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+)
+
+func TestBehavioralEndpoints(t *testing.T) {
+	server := NewServer(Spec{
+		AppName:    "Behavioral",
+		Domain:     "saas",
+		DepthLabel: "pilot",
+		Entities:   []string{"account"},
+		Workflows:  []string{"create_account"},
+		Users:      []string{"admin"},
+	})
+
+	tests := []struct {
+		name   string
+		method string
+		path   string
+		body   string
+		status int
+	}{
+		{name: "entity records", method: http.MethodGet, path: "/v1/entities/account/records", status: http.StatusOK},
+		{name: "entity create", method: http.MethodPost, path: "/v1/entities/account/records", body: ` + "`{\"name\":\"ACME\"}`" + `, status: http.StatusCreated},
+		{name: "action execute", method: http.MethodPost, path: "/v1/actions/execute", body: ` + "`{\"action\":\"approve_request\",\"entity\":\"account\"}`" + `, status: http.StatusOK},
+		{name: "identity providers", method: http.MethodGet, path: "/v1/identity/providers", status: http.StatusOK},
+		{name: "primitives cms", method: http.MethodGet, path: "/v1/primitives/cms/pages", status: http.StatusOK},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest(tc.method, tc.path, strings.NewReader(tc.body))
+			if tc.body != "" {
+				req.Header.Set("Content-Type", "application/json")
+			}
+			rec := httptest.NewRecorder()
+			server.Handler().ServeHTTP(rec, req)
+			if rec.Code != tc.status {
+				t.Fatalf("expected status %d, got %d", tc.status, rec.Code)
+			}
+		})
+	}
+}
+`
+
+	identityModule := `package identity
+
+import (
+	"encoding/json"
+	"net/http"
+	"strings"
+	"time"
+)
+
+type Config struct {
+	PrimaryUsers []string ` + "`json:\"primary_users\"`" + `
+	Constraints  []string ` + "`json:\"constraints\"`" + `
+}
+
+func RegisterRoutes(mux *http.ServeMux, cfg Config) {
+	mux.HandleFunc("/v1/identity/providers", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"providers": []map[string]any{
+				{"name": "auth0", "status": "stub"},
+				{"name": "clerk", "status": "stub"},
+				{"name": "supabase", "status": "stub"},
+			},
+			"separation": "control_plane_tokens_are_distinct_from_generated_app_identity",
+		})
+	})
+	mux.HandleFunc("/v1/identity/register", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+			return
+		}
+		type request struct {
+			Email string ` + "`json:\"email\"`" + `
+			Role  string ` + "`json:\"role\"`" + `
+		}
+		var req request
+		_ = json.NewDecoder(r.Body).Decode(&req)
+		role := strings.TrimSpace(req.Role)
+		if role == "" {
+			role = defaultRole(cfg.PrimaryUsers)
+		}
+		writeJSON(w, http.StatusCreated, map[string]any{
+			"user_id":    "user_" + sanitize(req.Email),
+			"email":      strings.TrimSpace(req.Email),
+			"role":       role,
+			"created_at": time.Now().UTC().Format(time.RFC3339),
+		})
+	})
+	mux.HandleFunc("/v1/identity/login", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"session_token": "session_stub",
+			"expires_in":    3600,
+			"mfa_mode":      "otp_optional",
+		})
+	})
+	mux.HandleFunc("/v1/identity/invitations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+			return
+		}
+		writeJSON(w, http.StatusCreated, map[string]any{
+			"invitation_id": "invite_stub",
+			"status":        "pending",
+		})
+	})
+	mux.HandleFunc("/v1/identity/roles", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+			return
+		}
+		roles := cfg.PrimaryUsers
+		if len(roles) == 0 {
+			roles = []string{"admin", "operator"}
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"roles":       roles,
+			"constraints": cfg.Constraints,
+		})
+	})
+	mux.HandleFunc("/v1/identity/subdomains/claim", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+			return
+		}
+		type request struct {
+			Subdomain string ` + "`json:\"subdomain\"`" + `
+		}
+		var req request
+		_ = json.NewDecoder(r.Body).Decode(&req)
+		subdomain := sanitize(req.Subdomain)
+		if subdomain == "" {
+			subdomain = "tenant"
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"subdomain": subdomain,
+			"status":    "reserved",
+		})
+	})
+}
+
+func writeJSON(w http.ResponseWriter, status int, body any) {
+	payload, _ := json.Marshal(body)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_, _ = w.Write(payload)
+}
+
+func sanitize(value string) string {
+	value = strings.TrimSpace(strings.ToLower(value))
+	if value == "" {
+		return ""
+	}
+	var b strings.Builder
+	for _, ch := range value {
+		if (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') {
+			b.WriteRune(ch)
+			continue
+		}
+		if ch == '-' || ch == '_' {
+			b.WriteRune(ch)
+		}
+	}
+	return strings.Trim(b.String(), "-_")
+}
+
+func defaultRole(primaryUsers []string) string {
+	for _, role := range primaryUsers {
+		role = strings.TrimSpace(role)
+		if role != "" {
+			return role
+		}
+	}
+	return "admin"
+}
+`
+
+	identityAuth0 := `package providers
+
+type Auth0Adapter struct{}
+
+func (a Auth0Adapter) Name() string {
+	return "auth0"
+}
+
+func (a Auth0Adapter) ValidateToken(token string) bool {
+	return token != ""
+}
+`
+
+	identityClerk := `package providers
+
+type ClerkAdapter struct{}
+
+func (a ClerkAdapter) Name() string {
+	return "clerk"
+}
+
+func (a ClerkAdapter) ValidateToken(token string) bool {
+	return token != ""
+}
+`
+
+	identitySupabase := `package providers
+
+type SupabaseAdapter struct{}
+
+func (a SupabaseAdapter) Name() string {
+	return "supabase"
+}
+
+func (a SupabaseAdapter) ValidateToken(token string) bool {
+	return token != ""
+}
+`
+
+	primitivesModule := `package primitives
+
+import (
+	"encoding/json"
+	"net/http"
+)
+
+func RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("/v1/primitives/cms/pages", handleCMSPages)
+	mux.HandleFunc("/v1/primitives/blog/posts", handleBlogPosts)
+	mux.HandleFunc("/v1/primitives/forum/threads", handleForumThreads)
+	mux.HandleFunc("/v1/primitives/email/messages", handleEmailMessages)
+}
+
+func handleCMSPages(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"pages": []map[string]any{{"slug": "home", "title": "Home"}},
+		"count": 1,
+	})
+}
+
+func handleBlogPosts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"posts": []map[string]any{{"slug": "hello-world", "title": "Hello World"}},
+		"count": 1,
+	})
+}
+
+func handleForumThreads(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"threads": []map[string]any{{"id": "thread-1", "title": "Welcome"}},
+		"count":   1,
+	})
+}
+
+func handleEmailMessages(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"messages": []map[string]any{{"id": "email-1", "subject": "Welcome to Violet"}},
+		"count":    1,
+	})
+}
+
+func writeJSON(w http.ResponseWriter, status int, body any) {
+	payload, _ := json.Marshal(body)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_, _ = w.Write(payload)
+}
+`
+
+	behaviorScript := `#!/usr/bin/env sh
+set -eu
+BASE_URL="${BASE_URL:-http://localhost:8090}"
+curl -fsS "$BASE_URL/health" | grep -q '"depth_label"'
+curl -fsS "$BASE_URL/v1/entities/account/records" >/dev/null
+curl -fsS -X POST "$BASE_URL/v1/actions/execute" -H "Content-Type: application/json" -d '{"action":"approve_request","entity":"account"}' >/dev/null
+curl -fsS "$BASE_URL/v1/primitives/cms/pages" >/dev/null
+curl -fsS "$BASE_URL/v1/identity/providers" >/dev/null
+echo "behavior-ok"
+`
+
 	smokeScript := `#!/usr/bin/env sh
 set -eu
 BASE_URL="${BASE_URL:-http://localhost:8090}"
@@ -287,10 +715,18 @@ echo "smoke-ok"
 		{Path: base + "/cmd/server/main.go", Language: "go", Content: mainGo},
 		{Path: base + "/internal/runtime/server.go", Language: "go", Content: runtimeServer},
 		{Path: base + "/internal/runtime/server_test.go", Language: "go", Content: runtimeTest},
+		{Path: base + "/internal/runtime/entity_actions.go", Language: "go", Content: runtimeEntityOps},
+		{Path: base + "/internal/runtime/behavior_test.go", Language: "go", Content: runtimeBehaviorTest},
 		{Path: base + "/internal/tools/catalog.go", Language: "go", Content: toolsCatalog},
+		{Path: base + "/internal/identity/module.go", Language: "go", Content: identityModule},
+		{Path: base + "/internal/identity/providers/auth0_adapter.go", Language: "go", Content: identityAuth0},
+		{Path: base + "/internal/identity/providers/clerk_adapter.go", Language: "go", Content: identityClerk},
+		{Path: base + "/internal/identity/providers/supabase_adapter.go", Language: "go", Content: identitySupabase},
+		{Path: base + "/internal/primitives/module.go", Language: "go", Content: primitivesModule},
 		{Path: base + "/internal/policy/rules.yaml", Language: "yaml", Content: policyFile},
 		{Path: base + "/internal/tools/contracts.ts", Language: "typescript", Content: toolContracts},
 		{Path: base + "/tests/smoke.sh", Language: "bash", Content: smokeScript},
+		{Path: base + "/tests/behavior.sh", Language: "bash", Content: behaviorScript},
 	}
 
 	integrations := conf.Integrations

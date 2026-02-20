@@ -114,8 +114,23 @@ func TestCreateJobIncludesBackendRuntimeArtifacts(t *testing.T) {
 		"/services/api/cmd/server/main.go",
 		"/services/api/internal/runtime/server.go",
 		"/services/api/internal/runtime/server_test.go",
+		"/services/api/internal/runtime/entity_actions.go",
+		"/services/api/internal/runtime/behavior_test.go",
 		"/services/api/internal/tools/catalog.go",
+		"/services/api/internal/identity/module.go",
+		"/services/api/internal/identity/providers/auth0_adapter.go",
+		"/services/api/internal/identity/providers/clerk_adapter.go",
+		"/services/api/internal/identity/providers/supabase_adapter.go",
+		"/services/api/internal/primitives/module.go",
 		"/services/api/tests/smoke.sh",
+		"/services/api/tests/behavior.sh",
+		"/tests/behavior/scenarios.yaml",
+		"/clients/web/modules/cms.ts",
+		"/clients/web/modules/blog.ts",
+		"/clients/web/modules/forum.ts",
+		"/clients/web/modules/email.ts",
+		"/clients/web/modules/auth.ts",
+		"/config/rbac.generated.json",
 		"/services/api/internal/integrations/stripe_adapter.go",
 		"/services/api/internal/integrations/slack_adapter.go",
 	}
@@ -141,6 +156,27 @@ func TestCreateJobIncludesBackendRuntimeArtifacts(t *testing.T) {
 	}
 	if ids["api_runtime_health"] != "pass" {
 		t.Fatalf("expected api_runtime_health pass, got %q", ids["api_runtime_health"])
+	}
+	if ids["api_runtime_depth_label"] != "pass" {
+		t.Fatalf("expected api_runtime_depth_label pass, got %q", ids["api_runtime_depth_label"])
+	}
+	if ids["api_runtime_entity_records"] != "pass" {
+		t.Fatalf("expected api_runtime_entity_records pass, got %q", ids["api_runtime_entity_records"])
+	}
+	if ids["api_runtime_action_execute"] != "pass" {
+		t.Fatalf("expected api_runtime_action_execute pass, got %q", ids["api_runtime_action_execute"])
+	}
+	if ids["api_runtime_primitives"] != "pass" {
+		t.Fatalf("expected api_runtime_primitives pass, got %q", ids["api_runtime_primitives"])
+	}
+	if ids["api_runtime_identity"] != "pass" {
+		t.Fatalf("expected api_runtime_identity pass, got %q", ids["api_runtime_identity"])
+	}
+	if job.DepthLabel != "pilot" {
+		t.Fatalf("expected default depth label pilot, got %q", job.DepthLabel)
+	}
+	if job.Verification.BehavioralPassRate < 1 {
+		t.Fatalf("expected behavioral pass rate >= 1, got %f", job.Verification.BehavioralPassRate)
 	}
 }
 
