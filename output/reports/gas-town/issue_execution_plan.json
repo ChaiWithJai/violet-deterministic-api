@@ -1,0 +1,64 @@
+{
+  "generated_at_utc": "2026-02-20T03:16:30Z",
+  "source": "manual-gas-town-fallback",
+  "notes": [
+    "scripts/collect_open_issues.sh and scripts/build_issue_execution_plan.py are not present in this repository; plan produced manually from GitHub issue/ticket data",
+    "R1-024 and R1-026 are P0 blockers and sequenced first"
+  ],
+  "issues": [
+    {
+      "issue_number": 6,
+      "ticket_id": "R1-024",
+      "title": "Generated app depth is scaffold-level, not behavioral",
+      "priority": "P0",
+      "status": "uphill",
+      "blocked_by": ["R1-010", "R1-011"],
+      "execution_order": 1,
+      "gate": "release-blocker"
+    },
+    {
+      "issue_number": 8,
+      "ticket_id": "R1-026",
+      "title": "Migration parity endpoints unimplemented — export/import gates outstanding",
+      "priority": "P0",
+      "status": "uphill",
+      "blocked_by": ["R1-014", "R1-015"],
+      "execution_order": 2,
+      "gate": "release-blocker"
+    },
+    {
+      "issue_number": 4,
+      "ticket_id": "R1-022",
+      "title": "Missing built-in product primitives (CMS/blog/forum/email)",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "blocked_by": ["R1-021"],
+      "execution_order": 3,
+      "gate": "cuttable"
+    },
+    {
+      "issue_number": 5,
+      "ticket_id": "R1-023",
+      "title": "Dynamic API namespace/resource/form/action model not matched",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "blocked_by": ["R1-009", "R1-021"],
+      "execution_order": 4,
+      "gate": "cuttable"
+    },
+    {
+      "issue_number": 7,
+      "ticket_id": "R1-025",
+      "title": "User lifecycle/admin/invite/subdomain governance is light",
+      "priority": "P1",
+      "status": "bet_accepted",
+      "blocked_by": ["R1-003", "R1-019"],
+      "execution_order": 5,
+      "gate": "cuttable"
+    }
+  ],
+  "policy": {
+    "branch_focus": "platform-first",
+    "cut_rule": "If P0 blocker unknowns remain unresolved by circuit-breaker date, defer P1 bet_accepted tickets"
+  }
+}
