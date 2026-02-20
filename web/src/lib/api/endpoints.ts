@@ -1,4 +1,4 @@
-import { api, idemKey } from './client';
+import { api, idemKey, joinApiUrl } from './client';
 import type {
   HealthResponse,
   DecisionRequest,
@@ -135,10 +135,10 @@ export const getStudioJTBD = (id: string) =>
   api<JTBDCoverage[]>(`/v1/studio/jobs/${id}/jtbd`);
 
 export const getStudioPreviewUrl = (jobId: string, baseUrl: string) =>
-  `${baseUrl}/v1/studio/jobs/${jobId}/preview`;
+  joinApiUrl(baseUrl, `/v1/studio/jobs/${jobId}/preview`);
 
 export const getStudioBundleUrl = (jobId: string, baseUrl: string) =>
-  `${baseUrl}/v1/studio/jobs/${jobId}/bundle`;
+  joinApiUrl(baseUrl, `/v1/studio/jobs/${jobId}/bundle`);
 
 // --- LLM ---
 export const getLLMProviders = () =>

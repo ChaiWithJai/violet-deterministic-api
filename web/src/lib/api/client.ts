@@ -1,6 +1,53 @@
 import type { ApiResult } from './types';
 import { authStore } from '../stores/auth.svelte';
 
+function trimTrailingSlash(value: string): string {
+  return value.replace(/\/+$/, '');
+}
+
+function ensureLeadingSlash(value: string): string {
+  return value.startsWith('/') ? value : `/${value}`;
+}
+
+export function joinApiUrl(baseUrl: string, path: string): string {
+  return `${trimTrailingSlash(baseUrl)}${ensureLeadingSlash(path)}`;
+}
+
+function looksLikeJson(text: string): boolean {
+  const trimmed = text.trim();
+  return trimmed.startsWith('{') || trimmed.startsWith('[');
+}
+
+async function parseResponseBody(res: Response): Promise<unknown> {
+  const raw = await res.text();
+  if (!raw) return {};
+
+  const contentType = res.headers.get('content-type') ?? '';
+  const shouldParseJson =
+    contentType.includes('application/json') || looksLikeJson(raw);
+
+  if (shouldParseJson) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return {
+        error: 'invalid_response_payload',
+        details: 'Expected JSON response but received malformed payload',
+        raw,
+      };
+    }
+  }
+
+  if (res.ok) {
+    return { value: raw };
+  }
+
+  return {
+    error: 'http_error',
+    details: raw,
+  };
+}
+
 export async function api<T>(
   path: string,
   opts: {
@@ -10,9 +57,11 @@ export async function api<T>(
   } = {},
 ): Promise<ApiResult<T>> {
   const { method = 'GET', body, idempotencyKey } = opts;
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
+  const headers: Record<string, string> = {};
+
+  if (body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (authStore.token) {
     headers['Authorization'] = `Bearer ${authStore.token}`;
@@ -22,22 +71,26 @@ export async function api<T>(
     headers['Idempotency-Key'] = idempotencyKey;
   }
 
-  const url = `${authStore.baseUrl}${path}`;
+  const url = joinApiUrl(authStore.baseUrl, path);
 
   try {
     const res = await fetch(url, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      body: body === undefined ? undefined : JSON.stringify(body),
     });
 
-    const data = await res.json();
+    const data = (await parseResponseBody(res)) as T;
     return { ok: res.ok, status: res.status, data };
   } catch (err) {
     return {
       ok: false,
       status: 0,
-      data: { error: 'network_error', details: String(err) } as T,
+      data: {
+        error: 'network_error',
+        details: err instanceof Error ? err.message : String(err),
+        url,
+      } as T,
     };
   }
 }

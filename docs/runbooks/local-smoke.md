@@ -192,3 +192,32 @@
    - `Workspace` field populated in the UI
    - generated code list includes web/mobile `index.html`, `app.js`, `app.css`, and `package.json`
    - console logs include `workspace materialized` line.
+
+## Verification evidence (2026-02-20 UTC, UI network_error hardening pass)
+
+### Machine context
+1. Timestamp: `2026-02-20T03:13:56Z`
+2. Kernel: `Darwin 25.2.0 arm64`
+3. Docker: `28.0.1`, Compose: `v2.33.1-desktop.1`
+
+### Mandatory platform checks
+1. `docker compose -f docker-compose.demo.yml config` -> PASS.
+2. `docker compose -f docker-compose.demo.yml up -d` -> PASS (all demo services started).
+3. `GET /v1/health` with bearer token -> PASS (`200`).
+4. Determinism checks:
+   - `POST /v1/decisions` twice with same `Idempotency-Key` -> PASS (`200/200`, identical payload bytes).
+   - `POST /v1/replay` with returned `decision_id` -> PASS (`200`, identical `decision_id` and `decision_hash` to original decision payload).
+
+### UI/API client fix verification
+1. `web/src/lib/api/client.ts` now classifies failures into:
+   - transport failures -> `network_error` with URL context
+   - HTTP failures -> preserved status with parsed JSON or raw text details
+   - empty/non-JSON payloads -> handled without mislabeling as network failure.
+2. `web/src/lib/stores/auth.svelte.ts` normalizes persisted `baseUrl` (trim + trailing slash removal + default fallback).
+3. URL joins now use a single helper across fetch/SSE/preview paths to avoid malformed `//v1/...` construction.
+4. Frontend quality gates:
+   - `npm run check` -> PASS (existing unrelated warning in `Accordion.svelte`)
+   - `npm run build` -> PASS.
+
+### Observed contract risk (follow-up)
+1. `POST /v1/replay` runtime payload currently does not include `hashes_match`, while `web/src/lib/api/types.ts` still expects it in `ReplayResponse`.

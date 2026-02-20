@@ -1,5 +1,6 @@
 import type { StudioEvent, StudioJob } from './types';
 import { authStore } from '../stores/auth.svelte';
+import { joinApiUrl } from './client';
 
 export interface JobStream {
   stop(): void;
@@ -15,8 +16,9 @@ export function createJobStream(
   let es: EventSource | null = null;
   let pollTimer: ReturnType<typeof setInterval> | null = null;
 
-  const eventsUrl = `${authStore.baseUrl}/v1/studio/jobs/${jobId}/events?token=${encodeURIComponent(authStore.token)}`;
-  const jobUrl = `${authStore.baseUrl}/v1/studio/jobs/${jobId}`;
+  const eventsBase = joinApiUrl(authStore.baseUrl, `/v1/studio/jobs/${jobId}/events`);
+  const eventsUrl = `${eventsBase}?token=${encodeURIComponent(authStore.token)}`;
+  const jobUrl = joinApiUrl(authStore.baseUrl, `/v1/studio/jobs/${jobId}`);
 
   function fetchJob() {
     fetch(jobUrl, {
