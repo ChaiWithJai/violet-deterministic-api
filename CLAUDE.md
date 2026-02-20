@@ -35,7 +35,8 @@ go vet ./...                        # Static analysis
 | Gorse      | 19086/19088 | Recommendation engine    |
 | API        | 4020  | VDA service                    |
 
-Dev auth tokens: `dev-token:t_acme:dev-user` and `ops-token:t_ops:ops-user`
+Dev auth token entries (`AUTH_TOKENS` format): `dev-token:t_acme:dev-user` and `ops-token:t_ops:ops-user`
+Bearer token values for API calls: `dev-token` or `ops-token` (first field only).
 
 ## Architecture
 
