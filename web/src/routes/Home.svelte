@@ -3,7 +3,7 @@
   import ClarifyChat from '../components/prompt/ClarifyChat.svelte';
   import ConfirmationForm from '../components/prompt/ConfirmationForm.svelte';
   import { agentPlan, agentClarify, createStudioJob } from '../lib/api/endpoints';
-  import type { AgentPlanResponse, StudioJobRequest } from '../lib/api/types';
+  import type { AgentPlanResponse, AgentClarifyResponse, ClarifyQuestion, Confirmation, StudioJobRequest } from '../lib/api/types';
 
   interface Props {
     onnavigate: (route: string) => void;
@@ -15,15 +15,19 @@
 
   let phase = $state<Phase>('prompt');
   let loading = $state(false);
-  let plan = $state<AgentPlanResponse | null>(null);
-  let clarifyQuestions = $state<string[]>([]);
+  let planResult = $state<AgentPlanResponse | null>(null);
+  let clarifyResult = $state<AgentClarifyResponse | null>(null);
+  let questions = $state<ClarifyQuestion[]>([]);
+  let confirmation = $state<Partial<Confirmation>>({});
+  let prompt = $state('');
   let error = $state<string | null>(null);
 
-  async function handlePrompt(prompt: string) {
+  async function handlePrompt(text: string) {
+    prompt = text;
     loading = true;
     error = null;
 
-    const res = await agentPlan({ prompt });
+    const res = await agentPlan({ prompt: text });
     loading = false;
 
     if (!res.ok) {
@@ -31,22 +35,47 @@
       return;
     }
 
-    plan = res.data;
+    planResult = res.data;
 
-    if (res.data.clarify_questions && res.data.clarify_questions.length > 0) {
-      clarifyQuestions = res.data.clarify_questions;
-      phase = 'clarify';
-    } else {
+    // Plan returns a suggested_blueprint — seed the confirmation and go to clarify
+    confirmation = {
+      prompt: text,
+      app_name: res.data.name,
+      plan: res.data.suggested_blueprint.plan,
+      region: res.data.suggested_blueprint.region,
+    };
+
+    // Start clarify to get questions
+    const clarifyRes = await agentClarify({
+      prompt: text,
+      confirmation,
+    });
+
+    if (!clarifyRes.ok) {
+      error = (clarifyRes.data as any).error || 'Clarify failed';
+      return;
+    }
+
+    clarifyResult = clarifyRes.data;
+    confirmation = clarifyRes.data.updated_confirmation;
+
+    if (clarifyRes.data.ready_to_generate) {
       phase = 'confirm';
+    } else {
+      questions = clarifyRes.data.questions;
+      phase = 'clarify';
     }
   }
 
   async function handleClarify(answers: Record<string, string>) {
-    if (!plan) return;
     loading = true;
     error = null;
 
-    const res = await agentClarify({ plan_id: plan.plan_id, answers });
+    const res = await agentClarify({
+      prompt,
+      confirmation,
+      answers,
+    });
     loading = false;
 
     if (!res.ok) {
@@ -54,11 +83,13 @@
       return;
     }
 
-    if (res.data.ready_to_generate || !res.data.clarify_questions?.length) {
-      plan = { ...plan!, steps: res.data.updated_steps || plan!.steps, ready_to_generate: true };
+    clarifyResult = res.data;
+    confirmation = res.data.updated_confirmation;
+
+    if (res.data.ready_to_generate) {
       phase = 'confirm';
     } else {
-      clarifyQuestions = res.data.clarify_questions!;
+      questions = res.data.questions;
     }
   }
 
@@ -74,7 +105,7 @@
       return;
     }
 
-    onnavigate(`/studio/${res.data.id}`);
+    onnavigate(`/studio/${res.data.job_id}`);
   }
 </script>
 
@@ -91,9 +122,9 @@
   {#if phase === 'prompt'}
     <PromptInput onsubmit={handlePrompt} {loading} />
   {:else if phase === 'clarify'}
-    <ClarifyChat questions={clarifyQuestions} onanswer={handleClarify} {loading} />
-  {:else if phase === 'confirm' && plan}
-    <ConfirmationForm {plan} ongenerate={handleGenerate} {loading} />
+    <ClarifyChat {questions} onanswer={handleClarify} {loading} summary={clarifyResult?.summary} />
+  {:else if phase === 'confirm'}
+    <ConfirmationForm {confirmation} checks={planResult?.checks ?? []} ongenerate={handleGenerate} {loading} />
   {/if}
 </div>
 

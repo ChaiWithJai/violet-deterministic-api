@@ -21,7 +21,13 @@
     getStudioBundleUrl,
     runStudioTarget,
   } from '../lib/api/endpoints';
-  import type { VerificationResult, JTBDCoverage as JTBDType } from '../lib/api/types';
+  import type {
+    ArtifactManifest,
+    ManifestFile,
+    VerificationReport as VerificationReportType,
+    JTBDCoverageItem,
+    StudioRunResponse,
+  } from '../lib/api/types';
 
   interface Props {
     jobId: string;
@@ -30,14 +36,36 @@
   let { jobId }: Props = $props();
 
   let activeTab = $state<'preview' | 'code' | 'workload' | 'verification'>('preview');
-  let artifacts = $state<Record<string, string>>({});
+  let manifest = $state<ArtifactManifest | null>(null);
   let selectedFile = $state('');
-  let verification = $state<VerificationResult[]>([]);
-  let jtbd = $state<JTBDType[]>([]);
+  let verification = $state<VerificationReportType | null>(null);
+  let jtbd = $state<JTBDCoverageItem[]>([]);
+  let runResults = $state<StudioRunResponse[]>([]);
   let sidebarCollapsed = $state(false);
 
   let previewUrl = $derived(getStudioPreviewUrl(jobId, authStore.baseUrl));
   let bundleUrl = $derived(getStudioBundleUrl(jobId, authStore.baseUrl));
+
+  let jobTitle = $derived(
+    jobStore.job?.confirmation?.prompt?.slice(0, 60) || 'Studio'
+  );
+  let jobTitleTruncated = $derived(
+    (jobStore.job?.confirmation?.prompt?.length ?? 0) > 60
+  );
+
+  // Derive file list from either manifest or job.files
+  let files = $derived<ManifestFile[]>(
+    manifest?.files ?? (jobStore.job?.artifact_manifest?.files ?? [])
+  );
+
+  // For code viewing: use job.files which has content
+  let fileContentMap = $derived.by(() => {
+    const map: Record<string, string> = {};
+    for (const f of jobStore.job?.files ?? []) {
+      map[f.path] = f.content;
+    }
+    return map;
+  });
 
   onMount(() => {
     jobStore.connect(jobId);
@@ -48,9 +76,10 @@
   async function loadArtifacts() {
     const res = await getStudioArtifacts(jobId);
     if (res.ok) {
-      artifacts = res.data;
-      const keys = Object.keys(artifacts);
-      if (keys.length > 0 && !selectedFile) selectedFile = keys[0];
+      manifest = res.data;
+      if (manifest.files.length > 0 && !selectedFile) {
+        selectedFile = manifest.files[0].path;
+      }
     }
   }
 
@@ -60,11 +89,14 @@
       getStudioJTBD(jobId),
     ]);
     if (vRes.ok) verification = vRes.data;
-    if (jRes.ok) jtbd = jRes.data;
+    if (jRes.ok) jtbd = jRes.data.jtbd_coverage;
   }
 
   async function handleRunTarget(target: string) {
-    await runStudioTarget(jobId, target);
+    const res = await runStudioTarget(jobId, target);
+    if (res.ok) {
+      runResults = [...runResults, res.data];
+    }
     loadVerification();
   }
 </script>
@@ -74,16 +106,14 @@
   <div class="studio-header">
     <div class="header-left">
       <h2 class="studio-title">
-        {jobStore.job?.prompt?.slice(0, 60) || 'Studio'}
-        {#if jobStore.job?.prompt && jobStore.job.prompt.length > 60}...{/if}
+        {jobTitle}
+        {#if jobTitleTruncated}...{/if}
       </h2>
-      <SSEIndicator connected={jobStore.connected} status={jobStore.job?.phase} />
+      <SSEIndicator connected={jobStore.connected} status={jobStore.job?.status} />
     </div>
     <div class="header-right">
       {#if jobStore.job}
         <Badge variant="accent">{jobStore.job.status}</Badge>
-        <Badge variant="default">{jobStore.job.phase}</Badge>
-        <span class="progress-text">{Math.round(jobStore.job.progress || 0)}%</span>
       {/if}
       <a href={bundleUrl} class="bundle-link" download>Download Bundle</a>
     </div>
@@ -93,7 +123,7 @@
   <div class="studio-grid" class:sidebar-collapsed={sidebarCollapsed}>
     <!-- Left: File Explorer -->
     <aside class="studio-sidebar">
-      <FileExplorer {artifacts} {selectedFile} onselect={(f) => selectedFile = f} />
+      <FileExplorer {files} {selectedFile} onselect={(f) => selectedFile = f} />
     </aside>
 
     <!-- Center: Main content -->
@@ -114,18 +144,18 @@
         {#if activeTab === 'preview'}
           <PreviewPanes {previewUrl} />
         {:else if activeTab === 'code'}
-          {#if selectedFile && artifacts[selectedFile]}
-            <CodeBlock code={artifacts[selectedFile]} lang={selectedFile.split('.').pop() || ''} maxHeight="600px" />
+          {#if selectedFile && fileContentMap[selectedFile]}
+            <CodeBlock code={fileContentMap[selectedFile]} lang={selectedFile.split('.').pop() || ''} maxHeight="600px" />
           {:else}
             <div class="empty-state">Select a file to view</div>
           {/if}
         {:else if activeTab === 'workload'}
-          <JobTimeline events={jobStore.events} currentPhase={jobStore.job?.phase || ''} />
+          <JobTimeline workload={jobStore.job?.workload ?? []} />
         {:else if activeTab === 'verification'}
           <div class="verification-tab">
-            <QualityGate onrun={handleRunTarget} results={verification} />
-            {#if verification.length > 0}
-              <VerificationReport results={verification} />
+            <QualityGate onrun={handleRunTarget} results={runResults} />
+            {#if verification}
+              <VerificationReport report={verification} />
             {/if}
             {#if jtbd.length > 0}
               <JTBDCoverage items={jtbd} />
@@ -138,10 +168,14 @@
     <!-- Right: Terminal -->
     <aside class="studio-terminal" class:collapsed={sidebarCollapsed}>
       <button class="collapse-btn" onclick={() => sidebarCollapsed = !sidebarCollapsed}>
-        {sidebarCollapsed ? '◀' : '▶'}
+        {sidebarCollapsed ? '\u25C0' : '\u25B6'}
       </button>
       {#if !sidebarCollapsed}
-        <TerminalPanel events={jobStore.events} {jobId} />
+        <TerminalPanel
+          terminalLogs={jobStore.job?.terminal_logs ?? []}
+          consoleLogs={jobStore.job?.console_logs ?? []}
+          {jobId}
+        />
       {/if}
     </aside>
   </div>
@@ -181,12 +215,6 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-  }
-
-  .progress-text {
-    font-family: var(--font-code);
-    font-size: 0.75rem;
-    color: var(--text-secondary);
   }
 
   .bundle-link {

@@ -1,62 +1,63 @@
 <script lang="ts">
-  import type { VerificationResult } from '../../lib/api/types';
+  import type { VerificationReport as VerificationReportType } from '../../lib/api/types';
   import Badge from '../shared/Badge.svelte';
 
   interface Props {
-    results: VerificationResult[];
+    report: VerificationReportType;
   }
 
-  let { results }: Props = $props();
+  let { report }: Props = $props();
 </script>
 
 <div class="verification-report">
-  {#each results as result}
-    <div class="report-item">
-      <div class="report-header">
-        <span class="report-target">{result.target}</span>
-        <Badge variant={result.status === 'pass' ? 'pass' : result.status === 'fail' ? 'fail' : 'degraded'}>
-          {result.status}
-        </Badge>
+  <div class="report-header">
+    <span class="report-id">Report {report.report_id}</span>
+    <Badge variant={report.verdict === 'pass' ? 'pass' : 'fail'}>
+      {report.verdict}
+    </Badge>
+  </div>
+  <div class="report-meta">
+    <span class="meta-time">Generated: {report.generated_at}</span>
+  </div>
+  <div class="report-checks">
+    {#each report.checks as check}
+      <div class="check-row">
+        <span class="check-status" class:pass={check.status === 'pass'} class:fail={check.status !== 'pass'}>
+          {check.status === 'pass' ? '\u2713' : '\u2717'}
+        </span>
+        <span class="check-id">{check.id}</span>
+        <span class="check-evidence">{check.evidence}</span>
       </div>
-      <div class="report-checks">
-        {#each result.checks as check}
-          <div class="check-row">
-            <span class="check-status" class:pass={check.status === 'pass'} class:fail={check.status !== 'pass'}>
-              {check.status === 'pass' ? '✓' : '✗'}
-            </span>
-            <span class="check-name">{check.name}</span>
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/each}
+    {/each}
+  </div>
 </div>
 
 <style>
   .verification-report {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-  }
-
-  .report-item {
     background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
   }
 
   .report-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--space-sm);
   }
 
-  .report-target {
-    font-weight: 600;
-    font-size: 0.875rem;
-    text-transform: capitalize;
+  .report-id {
+    font-family: var(--font-code);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+  }
+
+  .report-meta {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
   }
 
   .report-checks {
@@ -67,7 +68,7 @@
 
   .check-row {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--space-sm);
     font-size: 0.8125rem;
   }
@@ -75,11 +76,18 @@
   .check-status {
     font-size: 0.75rem;
     font-weight: 700;
+    flex-shrink: 0;
   }
   .check-status.pass { color: var(--pass); }
   .check-status.fail { color: var(--fail); }
 
-  .check-name {
-    color: var(--text-secondary);
+  .check-id {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .check-evidence {
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
   }
 </style>

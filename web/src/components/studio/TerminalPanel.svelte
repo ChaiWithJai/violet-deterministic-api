@@ -1,53 +1,75 @@
 <script lang="ts">
-  import type { StudioEvent } from '../../lib/api/types';
+  import { sendTerminalCommand } from '../../lib/api/endpoints';
 
   interface Props {
-    events: StudioEvent[];
+    terminalLogs: string[];
+    consoleLogs: string[];
     jobId: string;
   }
 
-  let { events, jobId }: Props = $props();
+  let { terminalLogs, consoleLogs, jobId }: Props = $props();
 
-  let consoleEvents = $derived(
-    events.filter((e) => e.type === 'console' || e.type === 'log' || e.message)
-  );
-
+  let activeTab = $state<'terminal' | 'console'>('terminal');
   let terminalInput = $state('');
+  let localOutput = $state<string[]>([]);
 
-  async function sendCommand() {
-    if (!terminalInput.trim()) return;
-    // Terminal command would POST to /v1/studio/jobs/{id}/terminal
+  async function handleCommand() {
+    const cmd = terminalInput.trim();
+    if (!cmd) return;
     terminalInput = '';
+    localOutput = [...localOutput, `$ ${cmd}`];
+
+    const res = await sendTerminalCommand(jobId, cmd);
+    if (res.ok) {
+      localOutput = [...localOutput, ...res.data.output];
+    } else {
+      localOutput = [...localOutput, `Error: command failed`];
+    }
   }
+
+  let allTerminalLines = $derived([...terminalLogs, ...localOutput]);
 </script>
 
 <div class="terminal-panel">
   <div class="terminal-tabs">
-    <span class="terminal-tab active">Console</span>
+    <button class="terminal-tab" class:active={activeTab === 'terminal'} onclick={() => activeTab = 'terminal'}>Terminal</button>
+    <button class="terminal-tab" class:active={activeTab === 'console'} onclick={() => activeTab = 'console'}>Console</button>
   </div>
 
   <div class="terminal-output">
-    {#each consoleEvents as event}
-      <div class="terminal-line">
-        <span class="terminal-prefix">&gt;</span>
-        <span class="terminal-text">{event.message || JSON.stringify(event.data)}</span>
-      </div>
-    {/each}
-    {#if consoleEvents.length === 0}
-      <div class="terminal-empty">Waiting for output...</div>
+    {#if activeTab === 'terminal'}
+      {#each allTerminalLines as line}
+        <div class="terminal-line">
+          <span class="terminal-text">{line}</span>
+        </div>
+      {/each}
+      {#if allTerminalLines.length === 0}
+        <div class="terminal-empty">Waiting for output...</div>
+      {/if}
+    {:else}
+      {#each consoleLogs as line}
+        <div class="terminal-line">
+          <span class="terminal-text">{line}</span>
+        </div>
+      {/each}
+      {#if consoleLogs.length === 0}
+        <div class="terminal-empty">No console logs</div>
+      {/if}
     {/if}
   </div>
 
-  <div class="terminal-input-bar">
-    <span class="terminal-prompt">$</span>
-    <input
-      type="text"
-      class="terminal-input"
-      placeholder="Enter command..."
-      bind:value={terminalInput}
-      onkeydown={(e) => e.key === 'Enter' && sendCommand()}
-    />
-  </div>
+  {#if activeTab === 'terminal'}
+    <div class="terminal-input-bar">
+      <span class="terminal-prompt">$</span>
+      <input
+        type="text"
+        class="terminal-input"
+        placeholder="Enter command..."
+        bind:value={terminalInput}
+        onkeydown={(e) => e.key === 'Enter' && handleCommand()}
+      />
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -65,6 +87,7 @@
     display: flex;
     padding: var(--space-xs);
     border-bottom: 1px solid var(--border-subtle);
+    gap: 2px;
   }
 
   .terminal-tab {
@@ -91,11 +114,6 @@
   .terminal-line {
     display: flex;
     gap: var(--space-sm);
-  }
-
-  .terminal-prefix {
-    color: var(--accent);
-    flex-shrink: 0;
   }
 
   .terminal-text {

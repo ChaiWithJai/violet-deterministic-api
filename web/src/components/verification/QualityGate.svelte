@@ -1,10 +1,11 @@
 <script lang="ts">
+  import type { StudioRunResponse } from '../../lib/api/types';
   import Badge from '../shared/Badge.svelte';
   import PillButton from '../shared/PillButton.svelte';
 
   interface Props {
     onrun: (target: string) => void;
-    results?: { target: string; status: string; checks: { name: string; status: string; message?: string }[] }[];
+    results?: StudioRunResponse[];
     loading?: boolean;
   }
 
@@ -41,11 +42,9 @@
           </div>
           {#each result.checks as check}
             <div class="result-check">
-              <span class="check-icon">{check.status === 'pass' ? '✓' : '✗'}</span>
-              <span class="check-name">{check.name}</span>
-              {#if check.message}
-                <span class="check-msg">{check.message}</span>
-              {/if}
+              <span class="check-icon">{check.status === 'pass' ? '\u2713' : '\u2717'}</span>
+              <span class="check-name">{check.id}</span>
+              <span class="check-evidence">{check.evidence}</span>
             </div>
           {/each}
         </div>
@@ -116,9 +115,10 @@
 
   .check-name {
     color: var(--text-secondary);
+    font-weight: 500;
   }
 
-  .check-msg {
+  .check-evidence {
     color: var(--text-tertiary);
     font-family: var(--font-code);
     font-size: 0.75rem;

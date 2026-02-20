@@ -26,7 +26,7 @@
   let loading = $state(false);
   let error = $state<string | null>(null);
 
-  let verified = $derived(verifyResult?.status === 'pass');
+  let verified = $derived(verifyResult?.verdict === 'pass');
 
   onMount(() => {
     loadApp();
@@ -117,11 +117,11 @@
         {loading ? 'Verifying...' : 'Run Verification'}
       </button>
       {#if verifyResult}
-        <Badge variant={verified ? 'pass' : 'fail'}>{verifyResult.status}</Badge>
+        <Badge variant={verified ? 'pass' : 'fail'}>{verifyResult.verdict}</Badge>
         <div class="verify-checks">
           {#each verifyResult.checks as check}
             <span class="check-item" class:pass={check.status === 'pass'}>
-              {check.status === 'pass' ? '✓' : '✗'} {check.name}
+              {check.status === 'pass' ? '\u2713' : '\u2717'} {check.id}
             </span>
           {/each}
         </div>

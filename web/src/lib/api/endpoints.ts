@@ -18,9 +18,12 @@ import type {
   AgentClarifyResponse,
   StudioJobRequest,
   StudioJob,
-  VerificationResult,
-  JTBDCoverage,
-  LLMProvider,
+  StudioRunResponse,
+  ArtifactManifest,
+  VerificationReport,
+  TerminalResponse,
+  ConsoleResponse,
+  LLMProvidersResponse,
   LLMInferRequest,
   LLMInferResponse,
   Tool,
@@ -119,20 +122,30 @@ export const getStudioJob = (id: string) =>
   api<StudioJob>(`/v1/studio/jobs/${id}`);
 
 export const getStudioArtifacts = (id: string) =>
-  api<Record<string, string>>(`/v1/studio/jobs/${id}/artifacts`);
+  api<ArtifactManifest>(`/v1/studio/jobs/${id}/artifacts`);
 
 export const runStudioTarget = (id: string, target: string) =>
-  api<{ status: string }>(`/v1/studio/jobs/${id}/run`, {
+  api<StudioRunResponse>(`/v1/studio/jobs/${id}/run`, {
     method: 'POST',
     body: { target },
     idempotencyKey: idemKey(),
   });
 
 export const getStudioVerification = (id: string) =>
-  api<VerificationResult[]>(`/v1/studio/jobs/${id}/verification`);
+  api<VerificationReport>(`/v1/studio/jobs/${id}/verification`);
 
 export const getStudioJTBD = (id: string) =>
-  api<JTBDCoverage[]>(`/v1/studio/jobs/${id}/jtbd`);
+  api<{ jtbd_coverage: import('./types').JTBDCoverageItem[] }>(`/v1/studio/jobs/${id}/jtbd`);
+
+export const sendTerminalCommand = (id: string, command: string) =>
+  api<TerminalResponse>(`/v1/studio/jobs/${id}/terminal`, {
+    method: 'POST',
+    body: { command },
+    idempotencyKey: idemKey(),
+  });
+
+export const getConsoleLogs = (id: string) =>
+  api<ConsoleResponse>(`/v1/studio/jobs/${id}/console`);
 
 export const getStudioPreviewUrl = (jobId: string, baseUrl: string) =>
   joinApiUrl(baseUrl, `/v1/studio/jobs/${jobId}/preview`);
@@ -142,7 +155,7 @@ export const getStudioBundleUrl = (jobId: string, baseUrl: string) =>
 
 // --- LLM ---
 export const getLLMProviders = () =>
-  api<{ providers: LLMProvider[] }>('/v1/llm/providers');
+  api<LLMProvidersResponse>('/v1/llm/providers');
 
 export const llmInfer = (req: LLMInferRequest) =>
   api<LLMInferResponse>('/v1/llm/infer', {
