@@ -1,0 +1,297 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - paragraph [ref=e3]: Human + Agent Build Studio
+    - heading "Prompt -> Confirm -> Generate -> Inspect" [level=1] [ref=e4]
+    - paragraph [ref=e5]: Design the app as a real user, align the structured scope, then inspect workload, generated code, terminal, and console output.
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - text: API Base URL
+        - textbox "API Base URL" [ref=e8]:
+          - /placeholder: http://localhost:4020
+          - text: http://localhost:4020
+      - generic [ref=e9]:
+        - text: Bearer Token
+        - textbox "Bearer Token" [ref=e10]: dev-token
+      - button "Check Health" [ref=e11] [cursor=pointer]
+    - generic [ref=e12]: "{ \"status\": 200, \"body\": { \"data_version\": \"data-v1\", \"idempotency_cleanup_deleted_total\": 0, \"policy_version\": \"policy-v1\", \"service\": \"violet-deterministic-api\", \"status\": \"ok\" } }"
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - heading "1) Prompt" [level=2] [ref=e15]
+      - generic [ref=e16]:
+        - text: What should this app do?
+        - textbox "What should this app do?" [ref=e17]:
+          - /placeholder: Build a personalized SaaS CRM with approvals, invoicing, and support automation.
+          - text: Build a fullstack CRM app
+      - button "Draft Structured Spec" [ref=e19] [cursor=pointer]
+    - generic [ref=e21]:
+      - heading "2) Confirmation Form" [level=2] [ref=e22]
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - text: App Name
+          - textbox "App Name" [ref=e25]:
+            - /placeholder: Acme CRM
+            - text: UI Gate Proof
+        - generic [ref=e26]:
+          - text: Domain
+          - textbox "Domain" [ref=e27]:
+            - /placeholder: crm
+        - generic [ref=e28]:
+          - text: Template
+          - textbox "Template" [ref=e29]: violet-rails-extension
+        - generic [ref=e30]:
+          - text: Source System
+          - textbox "Source System" [ref=e31]: violet-rails
+        - generic [ref=e32]:
+          - text: Plan
+          - combobox "Plan" [ref=e33]:
+            - option "starter" [selected]
+            - option "enterprise"
+        - generic [ref=e34]:
+          - text: Region
+          - textbox "Region" [ref=e35]: us-east-1
+        - generic [ref=e36]:
+          - text: Deployment Target
+          - combobox "Deployment Target" [ref=e37]:
+            - option "managed" [selected]
+            - option "self-host"
+      - generic [ref=e38]:
+        - text: Primary Users (one per line)
+        - textbox "Primary Users (one per line)" [ref=e39]:
+          - /placeholder: admin\noperations\ncustomer_success
+      - generic [ref=e40]:
+        - text: Core Workflows (one per line)
+        - textbox "Core Workflows (one per line)" [ref=e41]:
+          - /placeholder: create_customer\napprove_quote\nissue_invoice
+      - generic [ref=e42]:
+        - text: Data Entities (one per line)
+        - textbox "Data Entities (one per line)" [ref=e43]:
+          - /placeholder: account\ncontact\ninvoice
+      - generic [ref=e44]:
+        - text: Integrations (one per line)
+        - textbox "Integrations (one per line)" [ref=e45]:
+          - /placeholder: stripe\nslack
+      - generic [ref=e46]:
+        - text: Constraints (one per line)
+        - textbox "Constraints (one per line)" [ref=e47]:
+          - /placeholder: no_runtime_eval\nall_mutations_idempotent
+      - generic [ref=e48]:
+        - button "Align & Preview Structure" [ref=e49] [cursor=pointer]
+        - button "Generate Build Job" [ref=e50] [cursor=pointer]
+      - generic [ref=e52]: "{ \"status\": 201, \"body\": { \"job_id\": \"job_178befc8d05c1cf0\", \"tenant_id\": \"t_acme\", \"status\": \"generated\", \"created_at\": \"2026-02-19T04:21:41.096427168Z\", \"updated_at\": \"2026-02-19T04:21:41.096427168Z\", \"workspace_path\": \"output/studio/job_178befc8d05c1cf0\", \"confirmation\": { \"prompt\": \"Build a fullstack CRM app\", \"app_name\": \"UI Gate Proof\", \"domain\": \"\", \"template\": \"violet-rails-extension\", \"source_system\": \"violet-rails\", \"primary_users\": [ \"admin\", \"operator\" ], \"core_workflows\": [ \"create_record\", \"approve_record\", \"notify_user\" ], \"data_entities\": [ \"account\", \"workspace\", \"activity\" ], \"deployment_target\": \"managed\", \"region\": \"us-east-1\", \"plan\": \"starter\", \"integrations\": [], \"constraints\": [] }, \"workload\": [ { \"phase\": \"Shape\", \"task\": \"Finalize app contract and data entities\", \"owner\": \"product\", \"estimate_hours\": 4, \"status\": \"ready\" }, { \"phase\": \"Shape\", \"task\": \"Align template: violet-rails-extension from violet-rails\", \"owner\": \"platform\", \"estimate_hours\": 3, \"status\": \"ready\" }, { \"phase\": \"Build\", \"task\": \"Scaffold app blueprint and APIs\", \"owner\": \"platform\", \"estimate_hours\": 6, \"status\": \"ready\" }, { \"phase\": \"Build\", \"task\": \"Wire customization rules and mutation policies\", \"owner\": \"policy\", \"estimate_hours\": 5, \"status\": \"ready\" }, { \"phase\": \"Verify\", \"task\": \"Run machine-readable verification checks\", \"owner\": \"qa\", \"estimate_hours\": 3, \"status\": \"ready\" }, { \"phase\": \"Deploy\", \"task\": \"Prepare managed deployment intent\", \"owner\": \"release\", \"estimate_hours\": 2, \"status\": \"ready\" }, { \"phase\": \"Build\", \"task\": \"Implement workflow: create_record\", \"owner\": \"platform\", \"estimate_hours\": 2, \"status\": \"ready\" }, { \"phase\": \"Build\", \"task\": \"Implement workflow: approve_record\", \"owner\": \"platform\", \"estimate_hours\": 2, \"status\": \"ready\" }, { \"phase\": \"Build\", \"task\": \"Implement workflow: notify_user\", \"owner\": \"platform\", \"estimate_hours\": 2, \"status\": \"ready\" } ], \"files\": [ { \"path\": \"apps/ui-gate-proof/README.md\", \"language\": \"markdown\", \"content\": \"# UI Gate Proof\\n\\nGenerated from prompt-driven confirmation.\\n\\n## Template\\n\\n- `violet-rails-extension` (source: `violet-rails`)\\n\\n## Run\\n\\n- Validate blueprint\\n- Execute verify checks\\n- Create deploy intent (managed)\\n\" }, { \"path\": \"apps/ui-gate-proof/api/openapi.yaml\", \"language\": \"yaml\", \"content\": \"openapi: 3.1.0\\ninfo:\\n title: UI Gate Proof API\\n version: 0.1.0\\npaths:\\n /v1/ui-gate-proof/health:\\n get:\\n responses:\\n '200':\\n description: OK\\n /v1/ui-gate-proof/workflows/execute:\\n post:\\n responses:\\n '200':\\n description: Workflow execution result\\n\" }, { \"path\": \"apps/ui-gate-proof/blueprint.yaml\", \"language\": \"yaml\", \"content\": \"app:\\n name: UI Gate Proof\\n domain: \\n template: violet-rails-extension\\n source_system: violet-rails\\n plan: starter\\n region: us-east-1\\n deployment_target: managed\\nprimary_users:\\n - admin\\n - operator\\nentities:\\n - account\\n - workspace\\n - activity\\nworkflows:\\n - create_record\\n - approve_record\\n - notify_user\\nintegrations:\\n - none\\nconstraints:\\n - none\\n\" }, { \"path\": \"apps/ui-gate-proof/boilerplate/violet_rails_extension.md\", \"language\": \"markdown\", \"content\": \"# Violet Rails Extension Boilerplate\\n\\n## Source\\n\\n- template: violet-rails-extension\\n- source_system: violet-rails\\n\\n## Generated intent\\n\\n- Preserve deterministic API boundaries while extending Violet Rails behavior.\\n- Keep mutating actions idempotent and replay-safe.\\n- Expose all operator surfaces as API tools for human + AI loops.\\n\\n## Suggested next implementation files\\n\\n1. clients/web/src/modules/app-shell.tsx\\n2. clients/mobile/src/screens/home.tsx\\n3. services/api/src/routes/tenant-tools.ts\\n4. services/api/src/orchestration/langgraph-hooks.ts\\n\" }, { \"path\": \"apps/ui-gate-proof/clients/mobile/app.css\", \"language\": \"css\", \"content\": \"\\n:root { --bg:#0b1220; --panel:#1f2937; --ink:#f8fafc; --muted:#9fb1cb; }\\n* { box-sizing:border-box; }\\nbody { margin:0; min-height:100vh; background:radial-gradient(circle at 18%% 8%%,#1b3355,#0a111d); font-family:\\\"Plus Jakarta Sans\\\",\\\"Avenir Next\\\",\\\"Segoe UI\\\",sans-serif; color:var(--ink); }\\n#app { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; }\\n.phone { width:100%%; max-width:390px; height:760px; border-radius:28px; border:1px solid rgba(159,177,203,.35); background:linear-gradient(180deg,#0f172a,#111827); box-shadow:0 28px 60px rgba(2,6,23,.64); display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; }\\nheader { padding:14px; border-bottom:1px solid rgba(159,177,203,.2); background:rgba(15,23,42,.92); }\\nheader h1 { margin:0; font-size:16px; }\\nheader p { margin:3px 0 0; color:var(--muted); font-size:12px; }\\nmain { padding:12px; overflow:auto; display:grid; gap:10px; }\\n.card { border:1px solid rgba(159,177,203,.27); border-radius:14px; padding:11px; background:rgba(31,41,55,.86); }\\n.k { color:var(--muted); font-size:11px; text-transform:uppercase; }\\n.v { margin-top:6px; font-weight:700; }\\nul { margin:8px 0 0; padding-left:18px; }\\nli { margin:5px 0; }\\nnav { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; padding:8px; border-top:1px solid rgba(159,177,203,.2); background:rgba(15,23,42,.96); }\\n.tab { border:0; border-radius:10px; padding:8px 5px; font-size:11px; background:#1f2937; color:#d6e2f4; cursor:pointer; }\\n.tab.active { background:linear-gradient(120deg,#0e7490,#0f766e); color:#ecfeff; }\\n.chips { display:flex; gap:8px; flex-wrap:wrap; }\\n.chip { border:1px solid rgba(159,177,203,.35); border-radius:999px; padding:5px 8px; font-size:11px; }\\n\" }, { \"path\": \"apps/ui-gate-proof/clients/mobile/app.js\", \"language\": \"javascript\", \"content\": \"(function () {\\n const model = {\\\"JobID\\\":\\\"local-preview\\\",\\\"AppName\\\":\\\"UI Gate Proof\\\",\\\"Domain\\\":\\\"saas\\\",\\\"Plan\\\":\\\"starter\\\",\\\"Region\\\":\\\"us-east-1\\\",\\\"Deployment\\\":\\\"managed\\\",\\\"PrimaryUsers\\\":[\\\"admin\\\",\\\"operator\\\"],\\\"Workflows\\\":[\\\"create_record\\\",\\\"approve_record\\\",\\\"notify_user\\\"],\\\"Entities\\\":[\\\"account\\\",\\\"workspace\\\",\\\"activity\\\"],\\\"Integrations\\\":[\\\"none\\\"],\\\"WorkloadCount\\\":9,\\\"FileCount\\\":12,\\\"TerminalCount\\\":6,\\\"ConsoleCount\\\":6};\\n const state = { view: \\\"home\\\" };\\n const root = document.getElementById(\\\"app\\\");\\n if (!root) return;\\n\\n function esc(v) {\\n return String(v)\\n .replaceAll(\\\"&\\\", \\\"&amp;\\\")\\n .replaceAll(\\\"<\\\", \\\"&lt;\\\")\\n .replaceAll(\\\">\\\", \\\"&gt;\\\")\\n .replaceAll('\\\"', \\\"&quot;\\\")\\n .replaceAll(\\\"'\\\", \\\"&#39;\\\");\\n }\\n\\n function nav(id, label) {\\n return '<button class=\\\"tab ' + (state.view === id ? 'active' : '') + '\\\" data-view=\\\"' + id + '\\\">' + label + '</button>';\\n }\\n\\n function home() {\\n return '<section class=\\\"card\\\"><div class=\\\"k\\\">App</div><div class=\\\"v\\\">' + esc(model.AppName) + '</div></section>'\\n + '<section class=\\\"card\\\"><div class=\\\"k\\\">Plan</div><div class=\\\"v\\\">' + esc(model.Plan) + '</div></section>'\\n + '<section class=\\\"card\\\"><div class=\\\"k\\\">Deployment</div><div class=\\\"v\\\">' + esc(model.Deployment) + '</div></section>';\\n }\\n\\n function flows() {\\n return '<section class=\\\"card\\\"><div class=\\\"k\\\">Flows</div><ul>' + model.Workflows.map((wf) => '<li>' + esc(wf) + '</li>').join(\\\"\\\") + '</ul></section>';\\n }\\n\\n function data() {\\n return '<section class=\\\"card\\\"><div class=\\\"k\\\">Data</div><ul>' + model.Entities.map((e) => '<li>' + esc(e) + '</li>').join(\\\"\\\") + '</ul></section>';\\n }\\n\\n function ops() {\\n return '<section class=\\\"card\\\"><div class=\\\"k\\\">Job</div><div class=\\\"v\\\">' + esc(model.JobID) + '</div></section>'\\n + '<section class=\\\"card\\\"><div class=\\\"k\\\">Integrations</div><div class=\\\"chips\\\">' + model.Integrations.map((it) => '<span class=\\\"chip\\\">' + esc(it) + '</span>').join(\\\"\\\") + '</div></section>';\\n }\\n\\n function body() {\\n switch (state.view) {\\n case \\\"flows\\\":\\n return flows();\\n case \\\"data\\\":\\n return data();\\n case \\\"ops\\\":\\n return ops();\\n default:\\n return home();\\n }\\n }\\n\\n function render() {\\n root.innerHTML = '<div class=\\\"phone\\\">'\\n + '<header><h1>' + esc(model.AppName) + '</h1><p>' + esc(model.Domain) + '</p></header>'\\n + '<main>' + body() + '</main>'\\n + '<nav>'\\n + nav('home', 'Home')\\n + nav('flows', 'Flows')\\n + nav('data', 'Data')\\n + nav('ops', 'Ops')\\n + '</nav>'\\n + '</div>';\\n\\n root.querySelectorAll(\\\"[data-view]\\\").forEach((btn) => {\\n btn.addEventListener(\\\"click\\\", () => {\\n state.view = btn.getAttribute(\\\"data-view\\\") || \\\"home\\\";\\n render();\\n });\\n });\\n }\\n\\n render();\\n})();\" }, { \"path\": \"apps/ui-gate-proof/clients/mobile/index.html\", \"language\": \"html\", \"content\": \"<!doctype html>\\n<html lang=\\\"en\\\">\\n<head>\\n <meta charset=\\\"utf-8\\\" />\\n <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n <title>UI Gate Proof Mobile Runtime</title>\\n <link rel=\\\"stylesheet\\\" href=\\\"./app.css\\\" />\\n</head>\\n<body>\\n <div id=\\\"app\\\"></div>\\n <script src=\\\"./app.js\\\" defer></script>\\n</body>\\n</html>\" }, { \"path\": \"apps/ui-gate-proof/clients/web/app.css\", \"language\": \"css\", \"content\": \"\\n:root { --bg:#071123; --panel:#12213d; --ink:#eaf1ff; --muted:#9bb2dc; --accent:#21c7aa; }\\n* { box-sizing:border-box; }\\nbody { margin:0; font-family:\\\"Plus Jakarta Sans\\\",\\\"Avenir Next\\\",\\\"Segoe UI\\\",sans-serif; background:linear-gradient(170deg,#071123,#0f1f39 70%,#1f3558); color:var(--ink); min-height:100vh; }\\n.shell { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }\\n.sidebar { padding:16px; border-right:1px solid rgba(164,191,241,.24); background:rgba(9,18,35,.88); }\\n.sidebar h1 { margin:0 0 4px; font-size:18px; }\\n.sidebar p { margin:0 0 12px; color:var(--muted); font-size:12px; }\\n.tab { width:100%%; text-align:left; padding:9px; margin:0 0 8px; border-radius:10px; border:1px solid rgba(164,191,241,.24); background:#102447; color:#e6efff; cursor:pointer; }\\n.tab.active { border-color:#2de0c1; background:linear-gradient(120deg,#0d4f61,#175081); }\\n.main { padding:16px; }\\n.panel { border:1px solid rgba(164,191,241,.24); border-radius:12px; background:rgba(18,33,61,.85); padding:12px; }\\n.panel h2 { margin:0 0 10px; }\\n.metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px; }\\n.metric { border:1px solid rgba(164,191,241,.24); background:#102447; border-radius:10px; padding:10px; }\\n.metric .k { font-size:11px; text-transform:uppercase; color:var(--muted); }\\n.metric .v { font-size:22px; margin-top:6px; font-weight:700; }\\n.hint { color:var(--muted); font-size:13px; }\\ntable { width:100%%; border-collapse:collapse; }\\nth, td { text-align:left; border-bottom:1px solid rgba(164,191,241,.2); padding:8px; font-size:13px; }\\n.list { display:grid; gap:8px; }\\n.item { display:flex; justify-content:space-between; gap:8px; padding:9px; border-radius:10px; border:1px solid rgba(164,191,241,.24); background:#102447; }\\n.chips { display:flex; flex-wrap:wrap; gap:8px; }\\n.chip { border:1px solid rgba(164,191,241,.34); border-radius:999px; background:#102447; padding:5px 9px; font-size:12px; }\\n@media (max-width: 920px) { .shell { grid-template-columns:1fr; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }\\n\" }, { \"path\": \"apps/ui-gate-proof/clients/web/app.js\", \"language\": \"javascript\", \"content\": \"(function () {\\n const model = {\\\"JobID\\\":\\\"local-preview\\\",\\\"AppName\\\":\\\"UI Gate Proof\\\",\\\"Domain\\\":\\\"saas\\\",\\\"Plan\\\":\\\"starter\\\",\\\"Region\\\":\\\"us-east-1\\\",\\\"Deployment\\\":\\\"managed\\\",\\\"PrimaryUsers\\\":[\\\"admin\\\",\\\"operator\\\"],\\\"Workflows\\\":[\\\"create_record\\\",\\\"approve_record\\\",\\\"notify_user\\\"],\\\"Entities\\\":[\\\"account\\\",\\\"workspace\\\",\\\"activity\\\"],\\\"Integrations\\\":[\\\"none\\\"],\\\"WorkloadCount\\\":9,\\\"FileCount\\\":12,\\\"TerminalCount\\\":6,\\\"ConsoleCount\\\":6};\\n const state = {\\n view: \\\"dashboard\\\",\\n entities: model.Entities.map((name, idx) => ({ id: idx + 1, name, status: \\\"active\\\" })),\\n workflows: model.Workflows.map((name, idx) => ({ id: idx + 1, name, status: \\\"ready\\\" })),\\n };\\n\\n const root = document.getElementById(\\\"app\\\");\\n if (!root) return;\\n\\n function esc(v) {\\n return String(v)\\n .replaceAll(\\\"&\\\", \\\"&amp;\\\")\\n .replaceAll(\\\"<\\\", \\\"&lt;\\\")\\n .replaceAll(\\\">\\\", \\\"&gt;\\\")\\n .replaceAll('\\\"', \\\"&quot;\\\")\\n .replaceAll(\\\"'\\\", \\\"&#39;\\\");\\n }\\n\\n function navButton(id, label) {\\n return '<button class=\\\"tab ' + (state.view === id ? 'active' : '') + '\\\" data-view=\\\"' + id + '\\\">' + label + '</button>';\\n }\\n\\n function metrics() {\\n return [\\n [\\\"Workload\\\", model.WorkloadCount],\\n [\\\"Files\\\", model.FileCount],\\n [\\\"Terminal\\\", model.TerminalCount],\\n [\\\"Console\\\", model.ConsoleCount],\\n ].map(([k, v]) => '<div class=\\\"metric\\\"><div class=\\\"k\\\">' + esc(k) + '</div><div class=\\\"v\\\">' + esc(v) + '</div></div>').join(\\\"\\\");\\n }\\n\\n function dashboardView() {\\n return '<section class=\\\"panel\\\"><h2>Runtime Overview</h2><div class=\\\"metrics\\\">' + metrics() + '</div><div class=\\\"hint\\\">Click around to validate generated client structure before deployment.</div></section>';\\n }\\n\\n function entitiesView() {\\n const rows = state.entities.map((e) => '<tr><td>' + esc(e.id) + '</td><td>' + esc(e.name) + '</td><td>' + esc(e.status) + '</td></tr>').join(\\\"\\\");\\n return '<section class=\\\"panel\\\"><h2>Entities</h2><table><thead><tr><th>ID</th><th>Name</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></section>';\\n }\\n\\n function workflowsView() {\\n const items = state.workflows.map((wf) => '<div class=\\\"item\\\"><strong>' + esc(wf.name) + '</strong><span>' + esc(wf.status) + '</span></div>').join(\\\"\\\");\\n return '<section class=\\\"panel\\\"><h2>Workflows</h2><div class=\\\"list\\\">' + items + '</div></section>';\\n }\\n\\n function integrationsView() {\\n const chips = model.Integrations.map((it) => '<span class=\\\"chip\\\">' + esc(it) + '</span>').join(\\\"\\\");\\n return '<section class=\\\"panel\\\"><h2>Integrations</h2><div class=\\\"chips\\\">' + chips + '</div></section>';\\n }\\n\\n function opsView() {\\n return '<section class=\\\"panel\\\"><h2>Ops</h2><div class=\\\"item\\\"><strong>Job</strong><span>' + esc(model.JobID) + '</span></div><div class=\\\"item\\\"><strong>Plan</strong><span>' + esc(model.Plan) + '</span></div><div class=\\\"item\\\"><strong>Deployment</strong><span>' + esc(model.Deployment) + '</span></div></section>';\\n }\\n\\n function viewHTML() {\\n switch (state.view) {\\n case \\\"entities\\\":\\n return entitiesView();\\n case \\\"workflows\\\":\\n return workflowsView();\\n case \\\"integrations\\\":\\n return integrationsView();\\n case \\\"ops\\\":\\n return opsView();\\n default:\\n return dashboardView();\\n }\\n }\\n\\n function render() {\\n root.innerHTML = '<div class=\\\"shell\\\">'\\n + '<aside class=\\\"sidebar\\\">'\\n + '<h1>' + esc(model.AppName) + '</h1>'\\n + '<p>' + esc(model.Domain) + ' · ' + esc(model.Region) + '</p>'\\n + navButton('dashboard', 'Dashboard')\\n + navButton('entities', 'Entities')\\n + navButton('workflows', 'Workflows')\\n + navButton('integrations', 'Integrations')\\n + navButton('ops', 'Ops')\\n + '</aside>'\\n + '<main class=\\\"main\\\">'\\n + viewHTML()\\n + '</main>'\\n + '</div>';\\n\\n root.querySelectorAll(\\\"[data-view]\\\").forEach((btn) => {\\n btn.addEventListener(\\\"click\\\", () => {\\n state.view = btn.getAttribute(\\\"data-view\\\") || \\\"dashboard\\\";\\n render();\\n });\\n });\\n }\\n\\n render();\\n})();\" }, { \"path\": \"apps/ui-gate-proof/clients/web/index.html\", \"language\": \"html\", \"content\": \"<!doctype html>\\n<html lang=\\\"en\\\">\\n<head>\\n <meta charset=\\\"utf-8\\\" />\\n <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n <title>UI Gate Proof Web Runtime</title>\\n <link rel=\\\"stylesheet\\\" href=\\\"./app.css\\\" />\\n</head>\\n<body>\\n <div id=\\\"app\\\"></div>\\n <script src=\\\"./app.js\\\" defer></script>\\n</body>\\n</html>\" }, { \"path\": \"apps/ui-gate-proof/deploy/managed/deploy-intent.json\", \"language\": \"json\", \"content\": \"{\\n \\\"target\\\": \\\"managed\\\",\\n \\\"app_name\\\": \\\"UI Gate Proof\\\",\\n \\\"region\\\": \\\"us-east-1\\\",\\n \\\"plan\\\": \\\"starter\\\",\\n \\\"requires_approval\\\": true\\n}\\n\" }, { \"path\": \"apps/ui-gate-proof/deploy/self-host/docker-compose.yaml\", \"language\": \"yaml\", \"content\": \"version: \\\"3.9\\\"\\nservices:\\n web:\\n image: ghcr.io/violet/ui-gate-proof-web:latest\\n ports:\\n - \\\"8080:8080\\\"\\n environment:\\n - APP_NAME=UI Gate Proof\\n api:\\n image: ghcr.io/violet/ui-gate-proof-api:latest\\n ports:\\n - \\\"8090:8090\\\"\\n environment:\\n - POLICY_VERSION=v1\\n\" }, { \"path\": \"apps/ui-gate-proof/package.json\", \"language\": \"json\", \"content\": \"{\\n \\\"name\\\": \\\"ui-gate-proof\\\",\\n \\\"private\\\": true,\\n \\\"version\\\": \\\"0.1.0\\\",\\n \\\"description\\\": \\\"Generated Violet Rails extension scaffold\\\",\\n \\\"scripts\\\": {\\n \\\"serve:web\\\": \\\"python3 -m http.server 4173 -d ./clients/web\\\",\\n \\\"serve:mobile\\\": \\\"python3 -m http.server 4174 -d ./clients/mobile\\\"\\n }\\n}\\n\" }, { \"path\": \"apps/ui-gate-proof/src/agent_contract.ts\", \"language\": \"typescript\", \"content\": \"export interface AgentPlanRequest {\\n prompt: string;\\n target: \\\"managed\\\";\\n}\\n\\nexport interface AgentActRequest {\\n mutationClass: string;\\n payload: Record<string, unknown>;\\n}\\n\\nexport interface AgentVerifyResponse {\\n verdict: \\\"pass\\\" | \\\"fail\\\";\\n checks: Array<{ id: string; status: \\\"pass\\\" | \\\"fail\\\"; evidence: string }>;\\n}\\n\" }, { \"path\": \"apps/ui-gate-proof/tests/smoke.yaml\", \"language\": \"yaml\", \"content\": \"name: generated-smoke\\ndescription: Validate generated runtime and API contract for UI Gate Proof\\nchecks:\\n - id: web_runtime\\n assert: clients/web/index.html exists\\n - id: mobile_runtime\\n assert: clients/mobile/index.html exists\\n - id: api_contract\\n assert: api/openapi.yaml exists\\n\" }, { \"path\": \"apps/ui-gate-proof/workflows/definitions.json\", \"language\": \"json\", \"content\": \"{\\n \\\"workflows\\\": [\\\"create_record\\\",\\\"approve_record\\\",\\\"notify_user\\\"]\\n}\\n\" } ], \"artifact_manifest\": { \"generated_at\": \"2026-02-19T04:21:41.121980627Z\", \"workspace_path\": \"output/studio/job_178befc8d05c1cf0\", \"files\": [ { \"path\": \"apps/ui-gate-proof/README.md\", \"language\": \"markdown\", \"category\": \"docs\", \"size_bytes\": 213 }, { \"path\": \"apps/ui-gate-proof/api/openapi.yaml\", \"language\": \"yaml\", \"category\": \"api_contract\", \"size_bytes\": 297 }, { \"path\": \"apps/ui-gate-proof/blueprint.yaml\", \"language\": \"yaml\", \"category\": \"misc\", \"size_bytes\": 364 }, { \"path\": \"apps/ui-gate-proof/boilerplate/violet_rails_extension.md\", \"language\": \"markdown\", \"category\": \"migration_note\", \"size_bytes\": 550 }, { \"path\": \"apps/ui-gate-proof/clients/mobile/app.css\", \"language\": \"css\", \"category\": \"mobile_client\", \"size_bytes\": 1744 }, { \"path\": \"apps/ui-gate-proof/clients/mobile/app.js\", \"language\": \"javascript\", \"category\": \"mobile_client\", \"size_bytes\": 2736 }, { \"path\": \"apps/ui-gate-proof/clients/mobile/index.html\", \"language\": \"html\", \"category\": \"mobile_client\", \"size_bytes\": 325 }, { \"path\": \"apps/ui-gate-proof/clients/web/app.css\", \"language\": \"css\", \"category\": \"web_client\", \"size_bytes\": 2084 }, { \"path\": \"apps/ui-gate-proof/clients/web/app.js\", \"language\": \"javascript\", \"category\": \"web_client\", \"size_bytes\": 3963 }, { \"path\": \"apps/ui-gate-proof/clients/web/index.html\", \"language\": \"html\", \"category\": \"web_client\", \"size_bytes\": 322 }, { \"path\": \"apps/ui-gate-proof/deploy/managed/deploy-intent.json\", \"language\": \"json\", \"category\": \"deploy\", \"size_bytes\": 132 }, { \"path\": \"apps/ui-gate-proof/deploy/self-host/docker-compose.yaml\", \"language\": \"yaml\", \"category\": \"deploy\", \"size_bytes\": 294 }, { \"path\": \"apps/ui-gate-proof/package.json\", \"language\": \"json\", \"category\": \"misc\", \"size_bytes\": 288 }, { \"path\": \"apps/ui-gate-proof/src/agent_contract.ts\", \"language\": \"typescript\", \"category\": \"misc\", \"size_bytes\": 322 }, { \"path\": \"apps/ui-gate-proof/tests/smoke.yaml\", \"language\": \"yaml\", \"category\": \"test\", \"size_bytes\": 292 }, { \"path\": \"apps/ui-gate-proof/workflows/definitions.json\", \"language\": \"json\", \"category\": \"workflow\", \"size_bytes\": 68 } ], \"run_targets\": [ { \"name\": \"web\", \"description\": \"Validate web runtime artifacts\", \"command\": \"studio run web\" }, { \"name\": \"mobile\", \"description\": \"Validate mobile runtime artifacts\", \"command\": \"studio run mobile\" }, { \"name\": \"api\", \"description\": \"Validate backend contract artifacts\", \"command\": \"studio run api\" }, { \"name\": \"verify\", \"description\": \"Run deterministic verification checks\", \"command\": \"studio run verify\" }, { \"name\": \"all\", \"description\": \"Run all checks\", \"command\": \"studio run all\" } ] }, \"verification_report\": { \"report_id\": \"studio_vrf_9a897e30d48a9060\", \"verdict\": \"fail\", \"checks\": [ { \"id\": \"artifacts_required_present\", \"status\": \"pass\", \"evidence\": \"required runtime and api contract files\" }, { \"id\": \"tests_present\", \"status\": \"pass\", \"evidence\": \"at least one test artifact generated\" }, { \"id\": \"deploy_artifacts_present\", \"status\": \"pass\", \"evidence\": \"self-host and managed deploy artifacts present\" }, { \"id\": \"policy_constraints_present\", \"status\": \"fail\", \"evidence\": \"idempotency constraint captured\" } ], \"generated_at\": \"2026-02-19T04:21:41.121991418Z\" }, \"jtbd_coverage\": [ { \"id\": \"jtbd_create_app\", \"task\": \"Create app from prompt\", \"status\": \"pass\", \"evidence\": \"files=16 workload=9\" }, { \"id\": \"jtbd_customize_safely\", \"task\": \"Customize safely\", \"status\": \"fail\", \"evidence\": \"constraint all_mutations_idempotent present\" }, { \"id\": \"jtbd_validate_behavior\", \"task\": \"Validate behavior before deploy\", \"status\": \"fail\", \"evidence\": \"verification verdict from deterministic checks\" }, { \"id\": \"jtbd_operate_human_ai\", \"task\": \"Operate with human and AI agents\", \"status\": \"pass\", \"evidence\": \"agent contract artifact generated\" }, { \"id\": \"jtbd_ship\", \"task\": \"Ship self-host or managed\", \"status\": \"pass\", \"evidence\": \"deploy artifacts generated\" } ], \"terminal_logs\": [ \"$ scaffold init --template deterministic-saas\", \"$ scaffold app --name \\\"UI Gate Proof\\\" --region us-east-1 --plan starter\", \"$ scaffold contracts --human-api --agent-api\", \"$ scaffold verify --checks schema,policy,deploy_preflight\", \"$ scaffold deploy --target managed\", \"$ build complete\", \"$ cd output/studio/job_178befc8d05c1cf0\" ], \"console_logs\": [ \"[planner] prompt parsed and normalized\", \"[designer] structured confirmation converted to blueprint\", \"[builder] workload graph created\", \"[builder] code artifacts generated\", \"[runner] verify/deploy hooks prepared\", \"[builder] workspace materialized: output/studio/job_178befc8d05c1cf0\" ], \"preview_workload\": \"workload\", \"preview_code_path\": \"apps/ui-gate-proof/README.md\", \"preview_terminal\": \"$ cd output/studio/job_178befc8d05c1cf0\", \"preview_console\": \"[builder] workspace materialized: output/studio/job_178befc8d05c1cf0\" } }"
+    - generic [ref=e53]:
+      - heading "3) What Is Being Made" [level=2] [ref=e54]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - text: "Job ID:"
+          - code [ref=e57]: job_178befc8d05c1cf0
+        - generic [ref=e58]:
+          - text: "Status:"
+          - code [ref=e59]: generated
+        - generic [ref=e60]:
+          - text: "Workspace:"
+          - code [ref=e61]: output/studio/job_178befc8d05c1cf0
+        - generic [ref=e62]:
+          - text: "Stream:"
+          - code [ref=e63]: connected
+      - generic [ref=e64]:
+        - article [ref=e65]:
+          - heading "Workload Preview" [level=3] [ref=e66]
+          - table [ref=e209]:
+            - rowgroup [ref=e210]:
+              - row "Phase Task Owner Hours Status" [ref=e211]:
+                - columnheader "Phase" [ref=e212]
+                - columnheader "Task" [ref=e213]
+                - columnheader "Owner" [ref=e214]
+                - columnheader "Hours" [ref=e215]
+                - columnheader "Status" [ref=e216]
+            - rowgroup [ref=e217]:
+              - row "Shape Finalize app contract and data entities product 4 ready" [ref=e218]:
+                - cell "Shape" [ref=e219]
+                - cell "Finalize app contract and data entities" [ref=e220]
+                - cell "product" [ref=e221]
+                - cell "4" [ref=e222]
+                - cell "ready" [ref=e223]
+              - 'row "Shape Align template: violet-rails-extension from violet-rails platform 3 ready" [ref=e224]':
+                - cell "Shape" [ref=e225]
+                - 'cell "Align template: violet-rails-extension from violet-rails" [ref=e226]'
+                - cell "platform" [ref=e227]
+                - cell "3" [ref=e228]
+                - cell "ready" [ref=e229]
+              - row "Build Scaffold app blueprint and APIs platform 6 ready" [ref=e230]:
+                - cell "Build" [ref=e231]
+                - cell "Scaffold app blueprint and APIs" [ref=e232]
+                - cell "platform" [ref=e233]
+                - cell "6" [ref=e234]
+                - cell "ready" [ref=e235]
+              - row "Build Wire customization rules and mutation policies policy 5 ready" [ref=e236]:
+                - cell "Build" [ref=e237]
+                - cell "Wire customization rules and mutation policies" [ref=e238]
+                - cell "policy" [ref=e239]
+                - cell "5" [ref=e240]
+                - cell "ready" [ref=e241]
+              - row "Verify Run machine-readable verification checks qa 3 ready" [ref=e242]:
+                - cell "Verify" [ref=e243]
+                - cell "Run machine-readable verification checks" [ref=e244]
+                - cell "qa" [ref=e245]
+                - cell "3" [ref=e246]
+                - cell "ready" [ref=e247]
+              - row "Deploy Prepare managed deployment intent release 2 ready" [ref=e248]:
+                - cell "Deploy" [ref=e249]
+                - cell "Prepare managed deployment intent" [ref=e250]
+                - cell "release" [ref=e251]
+                - cell "2" [ref=e252]
+                - cell "ready" [ref=e253]
+              - 'row "Build Implement workflow: create_record platform 2 ready" [ref=e254]':
+                - cell "Build" [ref=e255]
+                - 'cell "Implement workflow: create_record" [ref=e256]'
+                - cell "platform" [ref=e257]
+                - cell "2" [ref=e258]
+                - cell "ready" [ref=e259]
+              - 'row "Build Implement workflow: approve_record platform 2 ready" [ref=e260]':
+                - cell "Build" [ref=e261]
+                - 'cell "Implement workflow: approve_record" [ref=e262]'
+                - cell "platform" [ref=e263]
+                - cell "2" [ref=e264]
+                - cell "ready" [ref=e265]
+              - 'row "Build Implement workflow: notify_user platform 2 ready" [ref=e266]':
+                - cell "Build" [ref=e267]
+                - 'cell "Implement workflow: notify_user" [ref=e268]'
+                - cell "platform" [ref=e269]
+                - cell "2" [ref=e270]
+                - cell "ready" [ref=e271]
+        - article [ref=e67]:
+          - heading "Live App Preview" [level=3] [ref=e68]
+          - generic [ref=e69]:
+            - button "Refresh Preview" [ref=e70] [cursor=pointer]
+            - link "Open Web" [ref=e71] [cursor=pointer]:
+              - /url: http://localhost:4020/v1/studio/jobs/job_178befc8d05c1cf0/preview?token=dev-token&client=web&ts=1771474901134
+            - link "Open Mobile" [ref=e72] [cursor=pointer]:
+              - /url: http://localhost:4020/v1/studio/jobs/job_178befc8d05c1cf0/preview?token=dev-token&client=mobile&ts=1771474901134
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: Web Client
+              - iframe [ref=e76]:
+                - generic [ref=f1e3]:
+                  - complementary [ref=f1e4]:
+                    - heading "UI Gate Proof" [level=1] [ref=f1e5]
+                    - paragraph [ref=f1e6]: saas · us-east-1
+                    - button "Dashboard" [ref=f1e7] [cursor=pointer]
+                    - button "Entities" [ref=f1e8] [cursor=pointer]
+                    - button "Workflows" [ref=f1e9] [cursor=pointer]
+                    - button "Integrations" [ref=f1e10] [cursor=pointer]
+                    - button "Ops" [ref=f1e11] [cursor=pointer]
+                  - main [ref=f1e12]:
+                    - generic [ref=f1e13]:
+                      - heading "Runtime Overview" [level=2] [ref=f1e14]
+                      - generic [ref=f1e15]:
+                        - generic [ref=f1e16]:
+                          - generic [ref=f1e17]: Workload
+                          - generic [ref=f1e18]: "9"
+                        - generic [ref=f1e19]:
+                          - generic [ref=f1e20]: Files
+                          - generic [ref=f1e21]: "12"
+                        - generic [ref=f1e22]:
+                          - generic [ref=f1e23]: Terminal
+                          - generic [ref=f1e24]: "6"
+                        - generic [ref=f1e25]:
+                          - generic [ref=f1e26]: Console
+                          - generic [ref=f1e27]: "6"
+                      - generic [ref=f1e28]: Click around to validate generated client structure before deployment.
+            - generic [ref=e77]:
+              - generic [ref=e78]: Mobile Client
+              - iframe [ref=e79]:
+                - generic [ref=f2e3]:
+                  - banner [ref=f2e4]:
+                    - heading "UI Gate Proof" [level=1] [ref=f2e5]
+                    - paragraph [ref=f2e6]: saas
+                  - main [ref=f2e7]:
+                    - generic [ref=f2e8]:
+                      - generic [ref=f2e9]: App
+                      - generic [ref=f2e10]: UI Gate Proof
+                    - generic [ref=f2e11]:
+                      - generic [ref=f2e12]: Plan
+                      - generic [ref=f2e13]: starter
+                    - generic [ref=f2e14]:
+                      - generic [ref=f2e15]: Deployment
+                      - generic [ref=f2e16]: managed
+                  - navigation [ref=f2e17]:
+                    - button "Home" [ref=f2e18] [cursor=pointer]
+                    - button "Flows" [ref=f2e19] [cursor=pointer]
+                    - button "Data" [ref=f2e20] [cursor=pointer]
+                    - button "Ops" [ref=f2e21] [cursor=pointer]
+        - article [ref=e80]:
+          - heading "Model Router (Local + Frontier)" [level=3] [ref=e81]
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - text: Provider
+              - combobox "Provider" [ref=e84]:
+                - option "ollama" [selected]
+                - option "frontier"
+            - generic [ref=e85]:
+              - text: Model
+              - textbox "Model" [ref=e86]: glm-4.7-flash:latest
+            - generic [ref=e87]:
+              - text: Temperature
+              - spinbutton "Temperature" [ref=e88]: "0.1"
+            - generic [ref=e89]:
+              - text: Max Tokens
+              - spinbutton "Max Tokens" [ref=e90]: "512"
+          - generic [ref=e91]:
+            - text: System Prompt
+            - textbox "System Prompt" [ref=e92]:
+              - /placeholder: You are a deterministic coding agent.
+          - generic [ref=e93]:
+            - text: Prompt
+            - textbox "Prompt" [ref=e94]:
+              - /placeholder: Draft an implementation plan for tenant-scoped RBAC + billing entitlements.
+              - text: "Return only: ok"
+          - generic [ref=e95]:
+            - checkbox "Auto-generate boilerplate + previews after model call" [checked] [ref=e96]
+            - text: Auto-generate boilerplate + previews after model call
+          - paragraph [ref=e97]: First model call may take 10-30s while local model warms up.
+          - generic [ref=e98]:
+            - button "Load Providers" [ref=e99] [cursor=pointer]
+            - button "Run Model Call" [ref=e100] [cursor=pointer]
+          - generic [ref=e101]: "{ \"status\": 200, \"body\": { \"default_model\": \"glm-4.7-flash:latest\", \"default_provider\": \"ollama\", \"providers\": [ { \"name\": \"ollama\", \"kind\": \"local\", \"base_url\": \"http://host.docker.internal:11434\", \"default_model\": \"glm-4.7-flash:latest\", \"reachable\": true, \"models\": [ \"glm-4.7-flash:latest\", \"gemma3:27b\" ] }, { \"name\": \"frontier\", \"kind\": \"remote\", \"base_url\": \"http://host.docker.internal:11434/v1\", \"default_model\": \"glm-4.7-flash:latest\", \"reachable\": true, \"models\": [ \"glm-4.7-flash:latest\", \"gemma3:27b\" ] } ] } }"
+        - article [ref=e103]:
+          - heading "Generated Code" [level=3] [ref=e104]
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - button "apps/ui-gate-proof/README.md" [ref=e272] [cursor=pointer]
+              - button "apps/ui-gate-proof/api/openapi.yaml" [ref=e273] [cursor=pointer]
+              - button "apps/ui-gate-proof/blueprint.yaml" [ref=e274] [cursor=pointer]
+              - button "apps/ui-gate-proof/boilerplate/violet_rails_extension.md" [ref=e275] [cursor=pointer]
+              - button "apps/ui-gate-proof/clients/mobile/app.css" [ref=e276] [cursor=pointer]
+              - button "apps/ui-gate-proof/clients/mobile/app.js" [ref=e277] [cursor=pointer]
+              - button "apps/ui-gate-proof/clients/mobile/index.html" [ref=e278] [cursor=pointer]
+              - button "apps/ui-gate-proof/clients/web/app.css" [ref=e279] [cursor=pointer]
+              - button "apps/ui-gate-proof/clients/web/app.js" [ref=e280] [cursor=pointer]
+              - button "apps/ui-gate-proof/clients/web/index.html" [ref=e281] [cursor=pointer]
+              - button "apps/ui-gate-proof/deploy/managed/deploy-intent.json" [ref=e282] [cursor=pointer]
+              - button "apps/ui-gate-proof/deploy/self-host/docker-compose.yaml" [ref=e283] [cursor=pointer]
+              - button "apps/ui-gate-proof/package.json" [ref=e284] [cursor=pointer]
+              - button "apps/ui-gate-proof/src/agent_contract.ts" [ref=e285] [cursor=pointer]
+              - button "apps/ui-gate-proof/tests/smoke.yaml" [ref=e286] [cursor=pointer]
+              - button "apps/ui-gate-proof/workflows/definitions.json" [ref=e287] [cursor=pointer]
+            - generic [ref=e107]: "# UI Gate Proof Generated from prompt-driven confirmation. ## Template - `violet-rails-extension` (source: `violet-rails`) ## Run - Validate blueprint - Execute verify checks - Create deploy intent (managed)"
+        - article [ref=e108]:
+          - heading "Release Gate" [level=3] [ref=e109]
+          - generic [ref=e110]:
+            - button "Run Web" [ref=e111] [cursor=pointer]
+            - button "Run Mobile" [ref=e112] [cursor=pointer]
+            - button "Run API" [ref=e113] [cursor=pointer]
+            - button "Run Verify" [ref=e114] [cursor=pointer]
+            - button "Run All" [active] [ref=e115] [cursor=pointer]
+          - generic [ref=e116]: "{ \"status\": 200, \"target\": \"all\", \"body\": { \"target\": \"all\", \"status\": \"fail\", \"checks\": [ { \"id\": \"web_runtime\", \"status\": \"pass\", \"evidence\": \"web runtime assets present\" }, { \"id\": \"mobile_runtime\", \"status\": \"pass\", \"evidence\": \"mobile runtime assets present\" }, { \"id\": \"api_openapi\", \"status\": \"pass\", \"evidence\": \"openapi generated\" }, { \"id\": \"api_agent_contract\", \"status\": \"pass\", \"evidence\": \"agent contract generated\" }, { \"id\": \"artifacts_required_present\", \"status\": \"pass\", \"evidence\": \"required runtime and api contract files\" }, { \"id\": \"tests_present\", \"status\": \"pass\", \"evidence\": \"at least one test artifact generated\" }, { \"id\": \"deploy_artifacts_present\", \"status\": \"pass\", \"evidence\": \"self-host and managed deploy artifacts present\" }, { \"id\": \"policy_constraints_present\", \"status\": \"fail\", \"evidence\": \"idempotency constraint captured\" } ], \"generated_at\": \"2026-02-19T04:21:44.680446253Z\" } }"
+          - generic [ref=e117]: "{ \"status\": 200, \"body\": { \"generated_at\": \"2026-02-19T04:21:44.680927962Z\", \"workspace_path\": \"output/studio/job_178befc8d05c1cf0\", \"files\": [ { \"path\": \"apps/ui-gate-proof/README.md\", \"language\": \"markdown\", \"category\": \"docs\", \"size_bytes\": 213 }, { \"path\": \"apps/ui-gate-proof/api/openapi.yaml\", \"language\": \"yaml\", \"category\": \"api_contract\", \"size_bytes\": 297 }, { \"path\": \"apps/ui-gate-proof/blueprint.yaml\", \"language\": \"yaml\", \"category\": \"misc\", \"size_bytes\": 364 }, { \"path\": \"apps/ui-gate-proof/boilerplate/violet_rails_extension.md\", \"language\": \"markdown\", \"category\": \"migration_note\", \"size_bytes\": 550 }, { \"path\": \"apps/ui-gate-proof/clients/mobile/app.css\", \"language\": \"css\", \"category\": \"mobile_client\", \"size_bytes\": 1744 }, { \"path\": \"apps/ui-gate-proof/clients/mobile/app.js\", \"language\": \"javascript\", \"category\": \"mobile_client\", \"size_bytes\": 2736 }, { \"path\": \"apps/ui-gate-proof/clients/mobile/index.html\", \"language\": \"html\", \"category\": \"mobile_client\", \"size_bytes\": 325 }, { \"path\": \"apps/ui-gate-proof/clients/web/app.css\", \"language\": \"css\", \"category\": \"web_client\", \"size_bytes\": 2084 }, { \"path\": \"apps/ui-gate-proof/clients/web/app.js\", \"language\": \"javascript\", \"category\": \"web_client\", \"size_bytes\": 3963 }, { \"path\": \"apps/ui-gate-proof/clients/web/index.html\", \"language\": \"html\", \"category\": \"web_client\", \"size_bytes\": 322 }, { \"path\": \"apps/ui-gate-proof/deploy/managed/deploy-intent.json\", \"language\": \"json\", \"category\": \"deploy\", \"size_bytes\": 132 }, { \"path\": \"apps/ui-gate-proof/deploy/self-host/docker-compose.yaml\", \"language\": \"yaml\", \"category\": \"deploy\", \"size_bytes\": 294 }, { \"path\": \"apps/ui-gate-proof/package.json\", \"language\": \"json\", \"category\": \"misc\", \"size_bytes\": 288 }, { \"path\": \"apps/ui-gate-proof/src/agent_contract.ts\", \"language\": \"typescript\", \"category\": \"misc\", \"size_bytes\": 322 }, { \"path\": \"apps/ui-gate-proof/tests/smoke.yaml\", \"language\": \"yaml\", \"category\": \"test\", \"size_bytes\": 292 }, { \"path\": \"apps/ui-gate-proof/workflows/definitions.json\", \"language\": \"json\", \"category\": \"workflow\", \"size_bytes\": 68 } ], \"run_targets\": [ { \"name\": \"web\", \"description\": \"Validate web runtime artifacts\", \"command\": \"studio run web\" }, { \"name\": \"mobile\", \"description\": \"Validate mobile runtime artifacts\", \"command\": \"studio run mobile\" }, { \"name\": \"api\", \"description\": \"Validate backend contract artifacts\", \"command\": \"studio run api\" }, { \"name\": \"verify\", \"description\": \"Run deterministic verification checks\", \"command\": \"studio run verify\" }, { \"name\": \"all\", \"description\": \"Run all checks\", \"command\": \"studio run all\" } ] } }"
+          - generic [ref=e118]: "{ \"status\": 200, \"body\": { \"report_id\": \"studio_vrf_80df9450671d394c\", \"verdict\": \"fail\", \"checks\": [ { \"id\": \"artifacts_required_present\", \"status\": \"pass\", \"evidence\": \"required runtime and api contract files\" }, { \"id\": \"tests_present\", \"status\": \"pass\", \"evidence\": \"at least one test artifact generated\" }, { \"id\": \"deploy_artifacts_present\", \"status\": \"pass\", \"evidence\": \"self-host and managed deploy artifacts present\" }, { \"id\": \"policy_constraints_present\", \"status\": \"fail\", \"evidence\": \"idempotency constraint captured\" } ], \"generated_at\": \"2026-02-19T04:21:44.68094542Z\" } }"
+          - generic [ref=e119]: "{ \"status\": 200, \"body\": { \"jtbd_coverage\": [ { \"id\": \"jtbd_create_app\", \"task\": \"Create app from prompt\", \"status\": \"pass\", \"evidence\": \"files=16 workload=9\" }, { \"id\": \"jtbd_customize_safely\", \"task\": \"Customize safely\", \"status\": \"fail\", \"evidence\": \"constraint all_mutations_idempotent present\" }, { \"id\": \"jtbd_validate_behavior\", \"task\": \"Validate behavior before deploy\", \"status\": \"fail\", \"evidence\": \"verification verdict from deterministic checks\" }, { \"id\": \"jtbd_operate_human_ai\", \"task\": \"Operate with human and AI agents\", \"status\": \"pass\", \"evidence\": \"agent contract artifact generated\" }, { \"id\": \"jtbd_ship\", \"task\": \"Ship self-host or managed\", \"status\": \"pass\", \"evidence\": \"deploy artifacts generated\" } ] } }"
+        - article [ref=e120]:
+          - heading "Terminal" [level=3] [ref=e121]
+          - generic [ref=e122]:
+            - textbox "help, ls, tree, cat apps/.../blueprint.yaml, grep policy, exec ls apps/<slug>" [ref=e123]
+            - button "Run" [ref=e124] [cursor=pointer]
+          - generic [ref=e125]: $ scaffold init --template deterministic-saas $ scaffold app --name "UI Gate Proof" --region us-east-1 --plan starter $ scaffold contracts --human-api --agent-api $ scaffold verify --checks schema,policy,deploy_preflight $ scaffold deploy --target managed $ build complete $ cd output/studio/job_178befc8d05c1cf0
+        - article [ref=e126]:
+          - heading "Console" [level=3] [ref=e127]
+          - generic [ref=e128]: "[planner] prompt parsed and normalized [designer] structured confirmation converted to blueprint [builder] workload graph created [builder] code artifacts generated [runner] verify/deploy hooks prepared [builder] workspace materialized: output/studio/job_178befc8d05c1cf0 [runner 2026-02-19T04:21:44Z] run target=all status=fail"

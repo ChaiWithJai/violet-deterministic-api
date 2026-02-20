@@ -1,0 +1,24 @@
+app:
+  name: Bundle App
+  domain: 
+  template: violet-rails-extension
+  source_system: violet-rails
+  plan: starter
+  region: us-east-1
+  deployment_target: managed
+primary_users:
+  - admin
+  - operator
+entities:
+  - account
+  - workspace
+  - activity
+workflows:
+  - create_record
+  - approve_record
+  - notify_user
+integrations:
+  - none
+constraints:
+  - all_mutations_idempotent
+  - no_runtime_eval

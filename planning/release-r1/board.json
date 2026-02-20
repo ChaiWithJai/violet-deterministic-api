@@ -1,0 +1,97 @@
+{
+  "release_id": "R1",
+  "board_name": "R1 Prompt-to-Production Board",
+  "last_updated": "2026-02-20",
+  "columns": [
+    {
+      "id": "bet_accepted",
+      "name": "Bet Accepted",
+      "wip_limit": null,
+      "ticket_ids": [
+        "R1-017",
+        "R1-020",
+        "R1-021"
+      ]
+    },
+    {
+      "id": "uphill",
+      "name": "Uphill",
+      "wip_limit": 6,
+      "ticket_ids": [
+        "R1-001",
+        "R1-002",
+        "R1-003",
+        "R1-005",
+        "R1-006",
+        "R1-008",
+        "R1-009",
+        "R1-010",
+        "R1-014",
+        "R1-015",
+        "R1-018",
+        "R1-019"
+      ]
+    },
+    {
+      "id": "downhill",
+      "name": "Downhill",
+      "wip_limit": 8,
+      "ticket_ids": [
+        "R1-004",
+        "R1-007",
+        "R1-011",
+        "R1-012",
+        "R1-013",
+        "R1-016"
+      ]
+    },
+    {
+      "id": "done",
+      "name": "Done",
+      "wip_limit": null,
+      "ticket_ids": []
+    },
+    {
+      "id": "cut",
+      "name": "Cut",
+      "wip_limit": null,
+      "ticket_ids": []
+    },
+    {
+      "id": "blocked",
+      "name": "Blocked",
+      "wip_limit": 3,
+      "ticket_ids": []
+    }
+  ],
+  "swimlanes": [
+    {
+      "id": "core",
+      "name": "Deterministic Core",
+      "scope_codes": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "id": "builder",
+      "name": "SaaS Builder",
+      "scope_codes": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "id": "go-live",
+      "name": "Deployment + Migration",
+      "scope_codes": [
+        "S5",
+        "S6"
+      ]
+    }
+  ],
+  "circuit_breaker": {
+    "check_date": "2026-03-13",
+    "rule": "If S1/S2 uphill unknowns are unresolved, cut S5/S6 breadth to preserve deterministic release quality"
+  }
+}

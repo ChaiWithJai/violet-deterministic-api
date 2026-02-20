@@ -1,0 +1,15 @@
+openapi: 3.1.0
+info:
+  title: Artifacts API
+  version: 0.1.0
+paths:
+  /v1/artifacts/health:
+    get:
+      responses:
+        '200':
+          description: OK
+  /v1/artifacts/workflows/execute:
+    post:
+      responses:
+        '200':
+          description: Workflow execution result

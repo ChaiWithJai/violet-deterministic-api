@@ -1,0 +1,15 @@
+openapi: 3.1.0
+info:
+  title: Bundle App API
+  version: 0.1.0
+paths:
+  /v1/bundle-app/health:
+    get:
+      responses:
+        '200':
+          description: OK
+  /v1/bundle-app/workflows/execute:
+    post:
+      responses:
+        '200':
+          description: Workflow execution result

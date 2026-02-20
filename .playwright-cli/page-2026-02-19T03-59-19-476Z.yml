@@ -1,0 +1,301 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - paragraph [ref=e3]: Human + Agent Build Studio
+    - heading "Prompt -> Confirm -> Generate -> Inspect" [level=1] [ref=e4]
+    - paragraph [ref=e5]: Design the app as a real user, align the structured scope, then inspect workload, generated code, terminal, and console output.
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - text: API Base URL
+        - textbox "API Base URL" [ref=e8]:
+          - /placeholder: http://localhost:4020
+          - text: http://localhost:4020
+      - generic [ref=e9]:
+        - text: Bearer Token
+        - textbox "Bearer Token" [ref=e10]: dev-token
+      - button "Check Health" [ref=e11] [cursor=pointer]
+    - generic [ref=e12]: "{ \"status\": 200, \"body\": { \"data_version\": \"data-v1\", \"idempotency_cleanup_deleted_total\": 0, \"policy_version\": \"policy-v1\", \"service\": \"violet-deterministic-api\", \"status\": \"ok\" } }"
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - heading "1) Prompt" [level=2] [ref=e15]
+      - generic [ref=e16]:
+        - text: What should this app do?
+        - textbox "What should this app do?" [ref=e17]:
+          - /placeholder: Build a personalized SaaS CRM with approvals, invoicing, and support automation.
+          - text: Build a SaaS CRM with approvals invoices and RBAC for web and mobile
+      - button "Draft Structured Spec" [ref=e19] [cursor=pointer]
+    - generic [ref=e21]:
+      - heading "2) Confirmation Form" [level=2] [ref=e22]
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - text: App Name
+          - textbox "App Name" [ref=e25]:
+            - /placeholder: Acme CRM
+            - text: Real World Proof
+        - generic [ref=e26]:
+          - text: Domain
+          - textbox "Domain" [ref=e27]:
+            - /placeholder: crm
+        - generic [ref=e28]:
+          - text: Template
+          - textbox "Template" [ref=e29]: violet-rails-extension
+        - generic [ref=e30]:
+          - text: Source System
+          - textbox "Source System" [ref=e31]: violet-rails
+        - generic [ref=e32]:
+          - text: Plan
+          - combobox "Plan" [ref=e33]:
+            - option "starter" [selected]
+            - option "enterprise"
+        - generic [ref=e34]:
+          - text: Region
+          - textbox "Region" [ref=e35]: us-east-1
+        - generic [ref=e36]:
+          - text: Deployment Target
+          - combobox "Deployment Target" [ref=e37]:
+            - option "managed" [selected]
+            - option "self-host"
+      - generic [ref=e38]:
+        - text: Primary Users (one per line)
+        - textbox "Primary Users (one per line)" [ref=e39]:
+          - /placeholder: admin\noperations\ncustomer_success
+      - generic [ref=e40]:
+        - text: Core Workflows (one per line)
+        - textbox "Core Workflows (one per line)" [ref=e41]:
+          - /placeholder: create_customer\napprove_quote\nissue_invoice
+      - generic [ref=e42]:
+        - text: Data Entities (one per line)
+        - textbox "Data Entities (one per line)" [ref=e43]:
+          - /placeholder: account\ncontact\ninvoice
+      - generic [ref=e44]:
+        - text: Integrations (one per line)
+        - textbox "Integrations (one per line)" [ref=e45]:
+          - /placeholder: stripe\nslack
+      - generic [ref=e46]:
+        - text: Constraints (one per line)
+        - textbox "Constraints (one per line)" [ref=e47]:
+          - /placeholder: no_runtime_eval\nall_mutations_idempotent
+      - generic [ref=e48]:
+        - button "Align & Preview Structure" [ref=e49] [cursor=pointer]
+        - button "Generate Build Job" [ref=e50] [cursor=pointer]
+      - generic [ref=e52]: "{ \"status\": \"generated_from_model_hook\", \"job_id\": \"job_65b1f2d5feabdf98\", \"hook\": { \"job_id\": \"job_65b1f2d5feabdf98\", \"name\": \"studio_generate\", \"paths\": { \"job\": \"/v1/studio/jobs/job_65b1f2d5feabdf98\", \"preview_mobile\": \"/v1/studio/jobs/job_65b1f2d5feabdf98/preview?client=mobile\", \"preview_web\": \"/v1/studio/jobs/job_65b1f2d5feabdf98/preview?client=web\" }, \"status\": \"ok\", \"summary\": { \"files\": 13, \"source_system\": \"violet-rails\", \"template\": \"violet-rails-extension\", \"workload_items\": 12 } } }"
+    - generic [ref=e53]:
+      - heading "3) What Is Being Made" [level=2] [ref=e54]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - text: "Job ID:"
+          - code [ref=e57]: job_65b1f2d5feabdf98
+        - generic [ref=e58]:
+          - text: "Status:"
+          - code [ref=e59]: generated
+        - generic [ref=e60]:
+          - text: "Workspace:"
+          - code [ref=e61]: output/studio/job_65b1f2d5feabdf98
+        - generic [ref=e62]:
+          - text: "Stream:"
+          - code [ref=e63]: connected
+      - generic [ref=e64]:
+        - article [ref=e65]:
+          - heading "Workload Preview" [level=3] [ref=e66]
+          - table [ref=e119]:
+            - rowgroup [ref=e120]:
+              - row "Phase Task Owner Hours Status" [ref=e121]:
+                - columnheader "Phase" [ref=e122]
+                - columnheader "Task" [ref=e123]
+                - columnheader "Owner" [ref=e124]
+                - columnheader "Hours" [ref=e125]
+                - columnheader "Status" [ref=e126]
+            - rowgroup [ref=e127]:
+              - row "Shape Finalize app contract and data entities product 4 ready" [ref=e128]:
+                - cell "Shape" [ref=e129]
+                - cell "Finalize app contract and data entities" [ref=e130]
+                - cell "product" [ref=e131]
+                - cell "4" [ref=e132]
+                - cell "ready" [ref=e133]
+              - 'row "Shape Align template: violet-rails-extension from violet-rails platform 3 ready" [ref=e134]':
+                - cell "Shape" [ref=e135]
+                - 'cell "Align template: violet-rails-extension from violet-rails" [ref=e136]'
+                - cell "platform" [ref=e137]
+                - cell "3" [ref=e138]
+                - cell "ready" [ref=e139]
+              - row "Build Scaffold app blueprint and APIs platform 6 ready" [ref=e140]:
+                - cell "Build" [ref=e141]
+                - cell "Scaffold app blueprint and APIs" [ref=e142]
+                - cell "platform" [ref=e143]
+                - cell "6" [ref=e144]
+                - cell "ready" [ref=e145]
+              - row "Build Wire customization rules and mutation policies policy 5 ready" [ref=e146]:
+                - cell "Build" [ref=e147]
+                - cell "Wire customization rules and mutation policies" [ref=e148]
+                - cell "policy" [ref=e149]
+                - cell "5" [ref=e150]
+                - cell "ready" [ref=e151]
+              - row "Verify Run machine-readable verification checks qa 3 ready" [ref=e152]:
+                - cell "Verify" [ref=e153]
+                - cell "Run machine-readable verification checks" [ref=e154]
+                - cell "qa" [ref=e155]
+                - cell "3" [ref=e156]
+                - cell "ready" [ref=e157]
+              - row "Deploy Prepare managed deployment intent release 2 ready" [ref=e158]:
+                - cell "Deploy" [ref=e159]
+                - cell "Prepare managed deployment intent" [ref=e160]
+                - cell "release" [ref=e161]
+                - cell "2" [ref=e162]
+                - cell "ready" [ref=e163]
+              - 'row "Build Implement workflow: capture_lead platform 2 ready" [ref=e164]':
+                - cell "Build" [ref=e165]
+                - 'cell "Implement workflow: capture_lead" [ref=e166]'
+                - cell "platform" [ref=e167]
+                - cell "2" [ref=e168]
+                - cell "ready" [ref=e169]
+              - 'row "Build Implement workflow: qualify_opportunity platform 2 ready" [ref=e170]':
+                - cell "Build" [ref=e171]
+                - 'cell "Implement workflow: qualify_opportunity" [ref=e172]'
+                - cell "platform" [ref=e173]
+                - cell "2" [ref=e174]
+                - cell "ready" [ref=e175]
+              - 'row "Build Implement workflow: approve_quote platform 2 ready" [ref=e176]':
+                - cell "Build" [ref=e177]
+                - 'cell "Implement workflow: approve_quote" [ref=e178]'
+                - cell "platform" [ref=e179]
+                - cell "2" [ref=e180]
+                - cell "ready" [ref=e181]
+              - 'row "Build Implement workflow: issue_invoice platform 2 ready" [ref=e182]':
+                - cell "Build" [ref=e183]
+                - 'cell "Implement workflow: issue_invoice" [ref=e184]'
+                - cell "platform" [ref=e185]
+                - cell "2" [ref=e186]
+                - cell "ready" [ref=e187]
+              - 'row "Build Implement workflow: manage_roles platform 2 ready" [ref=e188]':
+                - cell "Build" [ref=e189]
+                - 'cell "Implement workflow: manage_roles" [ref=e190]'
+                - cell "platform" [ref=e191]
+                - cell "2" [ref=e192]
+                - cell "ready" [ref=e193]
+              - 'row "Build Implement workflow: grant_permissions platform 2 ready" [ref=e194]':
+                - cell "Build" [ref=e195]
+                - 'cell "Implement workflow: grant_permissions" [ref=e196]'
+                - cell "platform" [ref=e197]
+                - cell "2" [ref=e198]
+                - cell "ready" [ref=e199]
+        - article [ref=e67]:
+          - heading "Live App Preview" [level=3] [ref=e68]
+          - generic [ref=e69]:
+            - button "Refresh Preview" [ref=e70] [cursor=pointer]
+            - link "Open Web" [ref=e71] [cursor=pointer]:
+              - /url: http://localhost:4020/v1/studio/jobs/job_65b1f2d5feabdf98/preview?token=dev-token&client=web&ts=1771473545305
+            - link "Open Mobile" [ref=e72] [cursor=pointer]:
+              - /url: http://localhost:4020/v1/studio/jobs/job_65b1f2d5feabdf98/preview?token=dev-token&client=mobile&ts=1771473545305
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: Web Client
+              - iframe [ref=e76]:
+                - generic [ref=f1e3]:
+                  - complementary [ref=f1e4]:
+                    - heading "Real World Proof" [level=1] [ref=f1e5]
+                    - paragraph [ref=f1e6]: crm · us-east-1
+                    - button "Dashboard" [ref=f1e7] [cursor=pointer]
+                    - button "Entities" [ref=f1e8] [cursor=pointer]
+                    - button "Workflows" [ref=f1e9] [cursor=pointer]
+                    - button "Integrations" [ref=f1e10] [cursor=pointer]
+                    - button "Ops" [ref=f1e11] [cursor=pointer]
+                  - main [ref=f1e12]:
+                    - generic [ref=f1e13]:
+                      - heading "Runtime Overview" [level=2] [ref=f1e14]
+                      - generic [ref=f1e15]:
+                        - generic [ref=f1e16]:
+                          - generic [ref=f1e17]: Workload
+                          - generic [ref=f1e18]: "12"
+                        - generic [ref=f1e19]:
+                          - generic [ref=f1e20]: Files
+                          - generic [ref=f1e21]: "0"
+                        - generic [ref=f1e22]:
+                          - generic [ref=f1e23]: Terminal
+                          - generic [ref=f1e24]: "0"
+                        - generic [ref=f1e25]:
+                          - generic [ref=f1e26]: Console
+                          - generic [ref=f1e27]: "0"
+                      - generic [ref=f1e28]: Click around to validate generated client structure before deployment.
+            - generic [ref=e77]:
+              - generic [ref=e78]: Mobile Client
+              - iframe [ref=e79]:
+                - generic [ref=f2e3]:
+                  - banner [ref=f2e4]:
+                    - heading "Real World Proof" [level=1] [ref=f2e5]
+                    - paragraph [ref=f2e6]: crm
+                  - main [ref=f2e7]:
+                    - generic [ref=f2e8]:
+                      - generic [ref=f2e9]: App
+                      - generic [ref=f2e10]: Real World Proof
+                    - generic [ref=f2e11]:
+                      - generic [ref=f2e12]: Plan
+                      - generic [ref=f2e13]: starter
+                    - generic [ref=f2e14]:
+                      - generic [ref=f2e15]: Deployment
+                      - generic [ref=f2e16]: managed
+                  - navigation [ref=f2e17]:
+                    - button "Home" [ref=f2e18] [cursor=pointer]
+                    - button "Flows" [ref=f2e19] [cursor=pointer]
+                    - button "Data" [ref=f2e20] [cursor=pointer]
+                    - button "Ops" [ref=f2e21] [cursor=pointer]
+        - article [ref=e80]:
+          - heading "Model Router (Local + Frontier)" [level=3] [ref=e81]
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - text: Provider
+              - combobox "Provider" [ref=e84]:
+                - option "ollama" [selected]
+                - option "frontier"
+            - generic [ref=e85]:
+              - text: Model
+              - textbox "Model" [ref=e86]: glm-4.7-flash:latest
+            - generic [ref=e87]:
+              - text: Temperature
+              - spinbutton "Temperature" [ref=e88]: "0.1"
+            - generic [ref=e89]:
+              - text: Max Tokens
+              - spinbutton "Max Tokens" [ref=e90]: "512"
+          - generic [ref=e91]:
+            - text: System Prompt
+            - textbox "System Prompt" [ref=e92]:
+              - /placeholder: You are a deterministic coding agent.
+          - generic [ref=e93]:
+            - text: Prompt
+            - textbox "Prompt" [ref=e94]:
+              - /placeholder: Draft an implementation plan for tenant-scoped RBAC + billing entitlements.
+              - text: Build a SaaS CRM with approvals invoices and RBAC for web and mobile
+          - generic [ref=e95]:
+            - checkbox "Auto-generate boilerplate + previews after model call" [checked] [ref=e96]
+            - text: Auto-generate boilerplate + previews after model call
+          - paragraph [ref=e97]: First model call may take 10-30s while local model warms up.
+          - generic [ref=e98]:
+            - button "Load Providers" [ref=e99] [cursor=pointer]
+            - button "Run Model Call" [ref=e200] [cursor=pointer]
+          - generic [ref=e101]: "{ \"status\": 200, \"body\": { \"default_model\": \"glm-4.7-flash:latest\", \"default_provider\": \"ollama\", \"providers\": [ { \"name\": \"ollama\", \"kind\": \"local\", \"base_url\": \"http://host.docker.internal:11434\", \"default_model\": \"glm-4.7-flash:latest\", \"reachable\": true, \"models\": [ \"glm-4.7-flash:latest\", \"gemma3:27b\" ] }, { \"name\": \"frontier\", \"kind\": \"remote\", \"base_url\": \"http://host.docker.internal:11434/v1\", \"default_model\": \"glm-4.7-flash:latest\", \"reachable\": true, \"models\": [ \"glm-4.7-flash:latest\", \"gemma3:27b\" ] } ] } }"
+          - generic [ref=e102]: "{ \"status\": 200, \"elapsed_ms\": 17292, \"body\": { \"hooks\": [ { \"job_id\": \"job_65b1f2d5feabdf98\", \"name\": \"studio_generate\", \"paths\": { \"job\": \"/v1/studio/jobs/job_65b1f2d5feabdf98\", \"preview_mobile\": \"/v1/studio/jobs/job_65b1f2d5feabdf98/preview?client=mobile\", \"preview_web\": \"/v1/studio/jobs/job_65b1f2d5feabdf98/preview?client=web\" }, \"status\": \"ok\", \"summary\": { \"files\": 13, \"source_system\": \"violet-rails\", \"template\": \"violet-rails-extension\", \"workload_items\": 12 } } ], \"result\": { \"provider\": \"ollama\", \"model\": \"glm-4.7-flash:latest\", \"text\": \"\", \"latency_ms\": 17269, \"usage\": { \"completion_tokens\": 512, \"prompt_tokens\": 20 }, \"raw\": { \"context\": [ 154822, 154824, 154827, 11061, 264, 328, 64143, 40119, 448, 82139, 63594, 323, 27879, 1706, 369, 3482, 323, 6371, 154828, 154841, 8419, 594, 264, 7274, 1882, 429, 11503, 311, 279, 11821, 3175, 15100, 40119, 3766, 1447, 16, 13, 220, 3070, 2082, 55481, 279, 6145, 25, 1019, 262, 353, 256, 3070, 39773, 66475, 7854, 264, 328, 64143, 40119, 320, 12786, 32653, 9547, 8, 3766, 624, 262, 353, 256, 3070, 1592, 19673, 66475, 18609, 25517, 11, 758, 40458, 11, 323, 27879, 1706, 320, 9027, 59919, 9545, 7779, 4292, 262, 353, 256, 3070, 86544, 66475, 4895, 323, 13402, 320, 6383, 550, 25907, 2884, 4292, 262, 353, 256, 3070, 12918, 66475, 11322, 9305, 1034, 11, 31923, 9305, 11290, 1220, 14, 12539, 11, 902, 47723, 11, 902, 29143, 11, 15617, 946, 7175, 11, 6481, 3689, 14, 13392, 382, 17, 13, 220, 3070, 1912, 7596, 279, 19673, 609, 37647, 25, 55798, 262, 353, 256, 3070, 29150, 1706, 320, 9027, 59919, 9545, 7779, 1648, 1019, 286, 353, 256, 14646, 264, 1616, 311, 37259, 2155, 12777, 320, 7210, 11, 10562, 11, 2657, 4292, 286, 353, 256, 14646, 264, 5858, 4171, 311, 3293, 264, 3476, 624, 286, 353, 256, 3689, 4344, 3118, 389, 279, 3476, 320, 68, 1302, 2572, 7582, 15622, 330, 28488, 25517, 497, 10562, 15622, 330, 641, 40458, 497, 2657, 15622, 330, 44584, 38401, 262, 353, 256, 3070, 26859, 320, 43267, 9514, 1648, 1019, 286, 353, 256, 34634, 10467, 320, 7595, 39374, 11, 41604, 18609, 25517, 11, 37199, 4292, 286, 353, 256, 34122, 5702, 5395, 624, 262, 353, 256, 3070, 28488, 25517, 13702, 25, 1019, 286, 353, 256, 1759, 315, 15268, 7388, 320, 68, 1302, 2572, 330, 3564, 12271, 4290, 497, 330, 34503, 53374, 38401, 286, 353, 256, 5586, 12418, 25, 18609, 586, 14, 77785, 624, 262, 353, 256, 3070, 641, 40458, 13702, 25, 1019, 286, 353, 256, 1759, 315, 63594, 624, 286, 353, 256, 8103, 33562, 320, 63157, 11, 41604, 11, 6065, 23581, 4292, 286, 353, 256, 330, 4021, 39969, 1, 13220, 624, 262, 353, 256, 3070, 44584, 13702, 25, 1019, 286, 353, 256, 1759, 315, 6310, 624, 286, 353, 256, 2691, 59024, 6002, 13220, 624, 262, 353, 256, 3070, 16385, 25, 1019, 286, 353, 256, 38492, 320, 17202, 68062, 369, 6371, 4292, 286, 353, 256, 6909, 3619, 320, 1474, 5526, 11, 15392, 3398, 261, 3593, 18, 13, 220, 3070, 2275, 14, 13392, 6982, 27651, 25, 1019, 262, 353, 256, 3070, 1636, 65925, 66475, 21189, 328, 64143, 1401, 13, 32180, 11, 21822, 11, 3100, 1081, 942, 11, 448, 12454, 7986, 369, 2639, 320, 19539, 284, 53720, 14, 59237, 11, 3731, 284, 1032, 28205, 14, 1918, 23581, 11, 21904, 284, 41604, 4292, 262, 353, 256, 3070, 2175, 66475, 38492, 10641, 488, 4697, 8881, 12024, 624, 262, 353, 256, 3070, 81489, 12775, 66475, 15167, 10582, 12312, 2571, 2011, 13, 38492, 9041, 264, 5622, 8074, 476, 88013, 5022, 389, 6371, 13, 26680, 5611, 50601, 624, 262, 353, 256, 3070, 3306, 7175, 66475, 15127, 27671, 2041, 2150, 18613, 82, 320, 86470, 2666, 568, 5650, 1127, 369, 7586, 13, 9605, 21915, 369, 11050, 382, 19, 13, 220, 3070, 8303, 14309, 12, 8303, 30691, 9676, 25, 55798, 262, 353, 256, 3070, 8303, 220, 16, 25, 9305, 28496, 25, 1019, 286, 353, 256, 8778, 2738, 320 ], \"created_at\": \"2026-02-19T03:59:05.278658Z\", \"done\": true, \"done_reason\": \"length\", \"eval_count\": 512, \"eval_duration\": 13392995497, \"load_duration\": 145945917, \"model\": \"glm-4.7-flash:latest\", \"prompt_eval_count\": 20, \"prompt_eval_duration\": 3615809417, \"response\": \"\", \"thinking\": \"Here's a thinking process that leads to the suggested single-page CRM application:\\n\\n1. **Analyze the Request:**\\n * **Goal:** Build a SaaS CRM (Customer Relationship Management) application.\\n * **Key Features:** Approvals, Invoices, and RBAC (Role-Based Access Control).\\n * **Platforms:** Web and Mobile (implies responsive design).\\n * **Constraints:** Single HTML file, vanilla HTML/CSS/JS, no frameworks, no alerts, functional interactivity, modern UI/UX.\\n\\n2. **Deconstruct the Features & Architecture:**\\n\\n * **RBAC (Role-Based Access Control):**\\n * Need a way to simulate different roles (Admin, Manager, User).\\n * Need a login screen to select a role.\\n * UI changes based on the role (e.g., Admin sees \\\"Approvals\\\", Manager sees \\\"Invoices\\\", User sees \\\"Customers\\\").\\n * **Dashboard (CRM Core):**\\n * Overview stats (Total Customers, Pending Approvals, Revenue).\\n * Recent activity feed.\\n * **Approvals Module:**\\n * List of pending requests (e.g., \\\"New Customer Created\\\", \\\"Invoice Raised\\\").\\n * Action buttons: Approve/Reject.\\n * **Invoices Module:**\\n * List of invoices.\\n * Status indicators (Paid, Pending, Overdue).\\n * \\\"Create Invoice\\\" modal.\\n * **Customers Module:**\\n * List of customers.\\n * Add/Edit customer modal.\\n * **Navigation:**\\n * Sidebar (collapsible for mobile).\\n * Top bar (User profile, Role switcher).\\n\\n3. **UI/UX Design Strategy:**\\n * **Color Palette:** Professional SaaS look. Blues, whites, light grays, with distinct colors for status (Green = Paid/Approved, Red = Rejected/Overdue, Orange = Pending).\\n * **Layout:** Sidebar navigation + Main Content Area.\\n * **Responsiveness:** CSS Grid/Flexbox. Sidebar becomes a bottom nav or hamburger menu on mobile. Cards stack vertically.\\n * **Interactivity:** Tab switching without page reloads (SPA feel). Modals for forms. Toast notifications for feedback.\\n\\n4. **Step-by-Step Implementation Plan:**\\n\\n * **Step 1: HTML Structure:**\\n * Login View (\", \"total_duration\": 17261130875 }, \"generated_at\": \"2026-02-19T03:59:05.284491972Z\", \"source_mode\": \"local\" }, \"tenant_id\": \"t_acme\" } }"
+        - article [ref=e103]:
+          - heading "Generated Code" [level=3] [ref=e104]
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - button "apps/real-world-proof/README.md" [ref=e201] [cursor=pointer]
+              - button "apps/real-world-proof/api/openapi.yaml" [ref=e202] [cursor=pointer]
+              - button "apps/real-world-proof/blueprint.yaml" [ref=e203] [cursor=pointer]
+              - button "apps/real-world-proof/boilerplate/violet_rails_extension.md" [ref=e204] [cursor=pointer]
+              - button "apps/real-world-proof/clients/mobile/app.css" [ref=e205] [cursor=pointer]
+              - button "apps/real-world-proof/clients/mobile/app.js" [ref=e206] [cursor=pointer]
+              - button "apps/real-world-proof/clients/mobile/index.html" [ref=e207] [cursor=pointer]
+              - button "apps/real-world-proof/clients/web/app.css" [ref=e208] [cursor=pointer]
+              - button "apps/real-world-proof/clients/web/app.js" [ref=e209] [cursor=pointer]
+              - button "apps/real-world-proof/clients/web/index.html" [ref=e210] [cursor=pointer]
+              - button "apps/real-world-proof/package.json" [ref=e211] [cursor=pointer]
+              - button "apps/real-world-proof/src/agent_contract.ts" [ref=e212] [cursor=pointer]
+              - button "apps/real-world-proof/workflows/definitions.json" [ref=e213] [cursor=pointer]
+            - generic [ref=e107]: "# Real World Proof Generated from prompt-driven confirmation. ## Template - `violet-rails-extension` (source: `violet-rails`) ## Run - Validate blueprint - Execute verify checks - Create deploy intent (managed)"
+        - article [ref=e108]:
+          - heading "Terminal" [level=3] [ref=e109]
+          - generic [ref=e110]:
+            - textbox "help, ls, tree, cat apps/.../blueprint.yaml, grep policy" [ref=e111]
+            - button "Run" [ref=e112] [cursor=pointer]
+          - generic [ref=e113]: $ scaffold init --template deterministic-saas $ scaffold app --name "Real World Proof" --region us-east-1 --plan starter $ scaffold contracts --human-api --agent-api $ scaffold verify --checks schema,policy,deploy_preflight $ scaffold deploy --target managed $ build complete $ cd output/studio/job_65b1f2d5feabdf98
+        - article [ref=e114]:
+          - heading "Console" [level=3] [ref=e115]
+          - generic [ref=e116]: "[planner] prompt parsed and normalized [designer] structured confirmation converted to blueprint [builder] workload graph created [builder] code artifacts generated [runner] verify/deploy hooks prepared [builder] workspace materialized: output/studio/job_65b1f2d5feabdf98"

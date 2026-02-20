@@ -1,0 +1,277 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - paragraph [ref=e3]: Human + Agent Build Studio
+    - heading "Prompt -> Confirm -> Generate -> Inspect" [level=1] [ref=e4]
+    - paragraph [ref=e5]: Design the app as a real user, align the structured scope, then inspect workload, generated code, terminal, and console output.
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - text: API Base URL
+        - textbox "API Base URL" [ref=e8]:
+          - /placeholder: http://localhost:4020
+          - text: http://localhost:4020
+      - generic [ref=e9]:
+        - text: Bearer Token
+        - textbox "Bearer Token" [ref=e10]: dev-token
+      - button "Check Health" [ref=e11] [cursor=pointer]
+    - generic [ref=e12]: "{ \"status\": 200, \"body\": { \"data_version\": \"data-v1\", \"idempotency_cleanup_deleted_total\": 0, \"policy_version\": \"policy-v1\", \"service\": \"violet-deterministic-api\", \"status\": \"ok\" } }"
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - heading "1) Prompt" [level=2] [ref=e15]
+      - generic [ref=e16]:
+        - text: What should this app do?
+        - textbox "What should this app do?" [ref=e17]:
+          - /placeholder: Build a personalized SaaS CRM with approvals, invoicing, and support automation.
+          - text: Build a SaaS CRM app with approvals, invoices, and operator tooling.
+      - button "Draft Structured Spec" [ref=e19] [cursor=pointer]
+    - generic [ref=e21]:
+      - heading "2) Confirmation Form" [level=2] [ref=e22]
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - text: App Name
+          - textbox "App Name" [ref=e25]:
+            - /placeholder: Acme CRM
+            - text: UI Hook Proof App
+        - generic [ref=e26]:
+          - text: Domain
+          - textbox "Domain" [ref=e27]:
+            - /placeholder: crm
+        - generic [ref=e28]:
+          - text: Template
+          - textbox "Template" [ref=e29]: violet-rails-extension
+        - generic [ref=e30]:
+          - text: Source System
+          - textbox "Source System" [ref=e31]: violet-rails
+        - generic [ref=e32]:
+          - text: Plan
+          - combobox "Plan" [ref=e33]:
+            - option "starter" [selected]
+            - option "enterprise"
+        - generic [ref=e34]:
+          - text: Region
+          - textbox "Region" [ref=e35]: us-east-1
+        - generic [ref=e36]:
+          - text: Deployment Target
+          - combobox "Deployment Target" [ref=e37]:
+            - option "managed" [selected]
+            - option "self-host"
+      - generic [ref=e38]:
+        - text: Primary Users (one per line)
+        - textbox "Primary Users (one per line)" [ref=e39]:
+          - /placeholder: admin\noperations\ncustomer_success
+      - generic [ref=e40]:
+        - text: Core Workflows (one per line)
+        - textbox "Core Workflows (one per line)" [ref=e41]:
+          - /placeholder: create_customer\napprove_quote\nissue_invoice
+      - generic [ref=e42]:
+        - text: Data Entities (one per line)
+        - textbox "Data Entities (one per line)" [ref=e43]:
+          - /placeholder: account\ncontact\ninvoice
+      - generic [ref=e44]:
+        - text: Integrations (one per line)
+        - textbox "Integrations (one per line)" [ref=e45]:
+          - /placeholder: stripe\nslack
+      - generic [ref=e46]:
+        - text: Constraints (one per line)
+        - textbox "Constraints (one per line)" [ref=e47]:
+          - /placeholder: no_runtime_eval\nall_mutations_idempotent
+      - generic [ref=e48]:
+        - button "Align & Preview Structure" [ref=e49] [cursor=pointer]
+        - button "Generate Build Job" [ref=e50] [cursor=pointer]
+      - generic [ref=e52]: "{ \"status\": \"generated_from_model_hook\", \"job_id\": \"job_4971c92043750eb4\", \"hook\": { \"job_id\": \"job_4971c92043750eb4\", \"name\": \"studio_generate\", \"paths\": { \"job\": \"/v1/studio/jobs/job_4971c92043750eb4\", \"preview_mobile\": \"/v1/studio/jobs/job_4971c92043750eb4/preview?client=mobile\", \"preview_web\": \"/v1/studio/jobs/job_4971c92043750eb4/preview?client=web\" }, \"status\": \"ok\", \"summary\": { \"files\": 10, \"source_system\": \"violet-rails\", \"template\": \"violet-rails-extension\", \"workload_items\": 9 } } }"
+    - generic [ref=e53]:
+      - heading "3) What Is Being Made" [level=2] [ref=e54]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - text: "Job ID:"
+          - code [ref=e57]: job_4971c92043750eb4
+        - generic [ref=e58]:
+          - text: "Status:"
+          - code [ref=e59]: generated
+        - generic [ref=e60]:
+          - text: "Stream:"
+          - code [ref=e61]: connected
+      - generic [ref=e62]:
+        - article [ref=e63]:
+          - heading "Workload Preview" [level=3] [ref=e64]
+          - table [ref=e117]:
+            - rowgroup [ref=e118]:
+              - row "Phase Task Owner Hours Status" [ref=e119]:
+                - columnheader "Phase" [ref=e120]
+                - columnheader "Task" [ref=e121]
+                - columnheader "Owner" [ref=e122]
+                - columnheader "Hours" [ref=e123]
+                - columnheader "Status" [ref=e124]
+            - rowgroup [ref=e125]:
+              - row "Shape Finalize app contract and data entities product 4 ready" [ref=e126]:
+                - cell "Shape" [ref=e127]
+                - cell "Finalize app contract and data entities" [ref=e128]
+                - cell "product" [ref=e129]
+                - cell "4" [ref=e130]
+                - cell "ready" [ref=e131]
+              - 'row "Shape Align template: violet-rails-extension from violet-rails platform 3 ready" [ref=e132]':
+                - cell "Shape" [ref=e133]
+                - 'cell "Align template: violet-rails-extension from violet-rails" [ref=e134]'
+                - cell "platform" [ref=e135]
+                - cell "3" [ref=e136]
+                - cell "ready" [ref=e137]
+              - row "Build Scaffold app blueprint and APIs platform 6 ready" [ref=e138]:
+                - cell "Build" [ref=e139]
+                - cell "Scaffold app blueprint and APIs" [ref=e140]
+                - cell "platform" [ref=e141]
+                - cell "6" [ref=e142]
+                - cell "ready" [ref=e143]
+              - row "Build Wire customization rules and mutation policies policy 5 ready" [ref=e144]:
+                - cell "Build" [ref=e145]
+                - cell "Wire customization rules and mutation policies" [ref=e146]
+                - cell "policy" [ref=e147]
+                - cell "5" [ref=e148]
+                - cell "ready" [ref=e149]
+              - row "Verify Run machine-readable verification checks qa 3 ready" [ref=e150]:
+                - cell "Verify" [ref=e151]
+                - cell "Run machine-readable verification checks" [ref=e152]
+                - cell "qa" [ref=e153]
+                - cell "3" [ref=e154]
+                - cell "ready" [ref=e155]
+              - row "Deploy Prepare managed deployment intent release 2 ready" [ref=e156]:
+                - cell "Deploy" [ref=e157]
+                - cell "Prepare managed deployment intent" [ref=e158]
+                - cell "release" [ref=e159]
+                - cell "2" [ref=e160]
+                - cell "ready" [ref=e161]
+              - 'row "Build Implement workflow: design_app_contract platform 2 ready" [ref=e162]':
+                - cell "Build" [ref=e163]
+                - 'cell "Implement workflow: design_app_contract" [ref=e164]'
+                - cell "platform" [ref=e165]
+                - cell "2" [ref=e166]
+                - cell "ready" [ref=e167]
+              - 'row "Build Implement workflow: generate_boilerplate platform 2 ready" [ref=e168]':
+                - cell "Build" [ref=e169]
+                - 'cell "Implement workflow: generate_boilerplate" [ref=e170]'
+                - cell "platform" [ref=e171]
+                - cell "2" [ref=e172]
+                - cell "ready" [ref=e173]
+              - 'row "Build Implement workflow: run_verify_checks platform 2 ready" [ref=e174]':
+                - cell "Build" [ref=e175]
+                - 'cell "Implement workflow: run_verify_checks" [ref=e176]'
+                - cell "platform" [ref=e177]
+                - cell "2" [ref=e178]
+                - cell "ready" [ref=e179]
+        - article [ref=e65]:
+          - heading "Live App Preview" [level=3] [ref=e66]
+          - generic [ref=e67]:
+            - button "Refresh Preview" [ref=e68] [cursor=pointer]
+            - link "Open Web" [ref=e69] [cursor=pointer]:
+              - /url: http://localhost:4020/v1/studio/jobs/job_4971c92043750eb4/preview?token=dev-token&client=web&ts=1771472869837
+            - link "Open Mobile" [ref=e70] [cursor=pointer]:
+              - /url: http://localhost:4020/v1/studio/jobs/job_4971c92043750eb4/preview?token=dev-token&client=mobile&ts=1771472869837
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - generic [ref=e73]: Web Client
+              - iframe [ref=e74]:
+                - generic [ref=f1e3]:
+                  - complementary [ref=f1e4]:
+                    - heading "UI Hook Proof App" [level=1] [ref=f1e5]
+                    - paragraph [ref=f1e6]: crm · us-east-1
+                    - button "Dashboard" [ref=f1e7] [cursor=pointer]
+                    - button "Entities" [ref=f1e8] [cursor=pointer]
+                    - button "Workflows" [ref=f1e9] [cursor=pointer]
+                    - button "Integrations" [ref=f1e10] [cursor=pointer]
+                    - button "Ops" [ref=f1e11] [cursor=pointer]
+                  - main [ref=f1e12]:
+                    - generic [ref=f1e13]:
+                      - heading "Runtime Overview" [level=2] [ref=f1e14]
+                      - generic [ref=f1e15]:
+                        - generic [ref=f1e16]:
+                          - generic [ref=f1e17]: Workload
+                          - generic [ref=f1e18]: "9"
+                        - generic [ref=f1e19]:
+                          - generic [ref=f1e20]: Files
+                          - generic [ref=f1e21]: "10"
+                        - generic [ref=f1e22]:
+                          - generic [ref=f1e23]: Terminal
+                          - generic [ref=f1e24]: "6"
+                        - generic [ref=f1e25]:
+                          - generic [ref=f1e26]: Console
+                          - generic [ref=f1e27]: "5"
+                      - generic [ref=f1e28]: Click around to validate generated client structure before deployment.
+            - generic [ref=e75]:
+              - generic [ref=e76]: Mobile Client
+              - iframe [ref=e77]:
+                - generic [ref=f2e3]:
+                  - banner [ref=f2e4]:
+                    - heading "UI Hook Proof App" [level=1] [ref=f2e5]
+                    - paragraph [ref=f2e6]: crm
+                  - main [ref=f2e7]:
+                    - generic [ref=f2e8]:
+                      - generic [ref=f2e9]: App
+                      - generic [ref=f2e10]: UI Hook Proof App
+                    - generic [ref=f2e11]:
+                      - generic [ref=f2e12]: Plan
+                      - generic [ref=f2e13]: starter
+                    - generic [ref=f2e14]:
+                      - generic [ref=f2e15]: Deployment
+                      - generic [ref=f2e16]: managed
+                  - navigation [ref=f2e17]:
+                    - button "Home" [ref=f2e18] [cursor=pointer]
+                    - button "Flows" [ref=f2e19] [cursor=pointer]
+                    - button "Data" [ref=f2e20] [cursor=pointer]
+                    - button "Ops" [ref=f2e21] [cursor=pointer]
+        - article [ref=e78]:
+          - heading "Model Router (Local + Frontier)" [level=3] [ref=e79]
+          - generic [ref=e80]:
+            - generic [ref=e81]:
+              - text: Provider
+              - combobox "Provider" [ref=e82]:
+                - option "ollama" [selected]
+                - option "frontier"
+            - generic [ref=e83]:
+              - text: Model
+              - textbox "Model" [ref=e84]: glm-4.7-flash:latest
+            - generic [ref=e85]:
+              - text: Temperature
+              - spinbutton "Temperature" [ref=e86]: "0.1"
+            - generic [ref=e87]:
+              - text: Max Tokens
+              - spinbutton "Max Tokens" [ref=e88]: "512"
+          - generic [ref=e89]:
+            - text: System Prompt
+            - textbox "System Prompt" [ref=e90]:
+              - /placeholder: You are a deterministic coding agent.
+          - generic [ref=e91]:
+            - text: Prompt
+            - textbox "Prompt" [ref=e92]:
+              - /placeholder: Draft an implementation plan for tenant-scoped RBAC + billing entitlements.
+              - text: Build a SaaS CRM app with approvals, invoices, and operator tooling.
+          - generic [ref=e93]:
+            - checkbox "Auto-generate boilerplate + previews after model call" [checked] [ref=e94]
+            - text: Auto-generate boilerplate + previews after model call
+          - paragraph [ref=e95]: First model call may take 10-30s while local model warms up.
+          - generic [ref=e96]:
+            - button "Load Providers" [ref=e97] [cursor=pointer]
+            - button "Run Model Call" [ref=e180] [cursor=pointer]
+          - generic [ref=e99]: "{ \"status\": 200, \"body\": { \"default_model\": \"glm-4.7-flash:latest\", \"default_provider\": \"ollama\", \"providers\": [ { \"name\": \"ollama\", \"kind\": \"local\", \"base_url\": \"http://host.docker.internal:11434\", \"default_model\": \"glm-4.7-flash:latest\", \"reachable\": true, \"models\": [ \"glm-4.7-flash:latest\", \"gemma3:27b\" ] }, { \"name\": \"frontier\", \"kind\": \"remote\", \"base_url\": \"http://host.docker.internal:11434/v1\", \"default_model\": \"glm-4.7-flash:latest\", \"reachable\": true, \"models\": [ \"glm-4.7-flash:latest\", \"gemma3:27b\" ] } ] } }"
+          - generic [ref=e100]: "{ \"status\": 200, \"elapsed_ms\": 19610, \"body\": { \"hooks\": [ { \"job_id\": \"job_4971c92043750eb4\", \"name\": \"studio_generate\", \"paths\": { \"job\": \"/v1/studio/jobs/job_4971c92043750eb4\", \"preview_mobile\": \"/v1/studio/jobs/job_4971c92043750eb4/preview?client=mobile\", \"preview_web\": \"/v1/studio/jobs/job_4971c92043750eb4/preview?client=web\" }, \"status\": \"ok\", \"summary\": { \"files\": 10, \"source_system\": \"violet-rails\", \"template\": \"violet-rails-extension\", \"workload_items\": 9 } } ], \"result\": { \"provider\": \"ollama\", \"model\": \"glm-4.7-flash:latest\", \"text\": \"\", \"latency_ms\": 19610, \"usage\": { \"completion_tokens\": 512, \"prompt_tokens\": 21 }, \"raw\": { \"context\": [ 154822, 154824, 154827, 11061, 264, 328, 64143, 40119, 906, 448, 82139, 11, 63594, 11, 323, 5675, 5392, 287, 13, 154828, 154841, 8419, 594, 264, 7274, 1882, 429, 11503, 311, 279, 11821, 328, 64143, 40119, 3766, 1447, 16, 13, 220, 3070, 2082, 55481, 279, 6145, 25, 1019, 262, 353, 256, 3070, 39773, 66475, 7854, 264, 328, 64143, 40119, 320, 12786, 32653, 9547, 8, 3766, 624, 262, 353, 256, 3070, 1592, 19673, 66475, 18609, 25517, 320, 55870, 701, 758, 40458, 320, 38429, 701, 323, 28398, 13465, 287, 320, 18608, 14, 42229, 4292, 262, 353, 256, 3070, 12918, 66475, 11322, 9305, 1034, 11, 31923, 9305, 11290, 1220, 14, 12539, 320, 2152, 47723, 701, 902, 9862, 29143, 11, 6481, 3689, 14, 13392, 11, 25907, 11, 20708, 11, 41497, 9305, 382, 17, 13, 220, 3070, 44318, 928, 2022, 609, 37647, 25, 1019, 262, 353, 256, 353, 12588, 53031, 21189, 11, 4240, 11, 55566, 320, 50, 64143, 46423, 568, 8696, 14, 1425, 7836, 1894, 26225, 374, 5297, 369, 40119, 624, 262, 353, 256, 353, 2175, 53031, 38492, 10641, 320, 17202, 68062, 389, 6371, 701, 1909, 4247, 320, 872, 5526, 11, 21915, 701, 1887, 2213, 3082, 624, 262, 353, 256, 353, 1043, 28496, 320, 11566, 2885, 1648, 9, 8703, 1052, 594, 902, 19127, 11, 358, 1184, 264, 21713, 12907, 1633, 311, 3331, 1584, 320, 44584, 11, 80864, 11, 758, 40458, 11, 63323, 50549, 4292, 262, 353, 256, 353, 23154, 25, 5618, 286, 220, 16, 13, 220, 3070, 26859, 66475, 34634, 10467, 11, 3213, 5702, 624, 286, 220, 17, 13, 220, 3070, 2304, 7664, 14, 44584, 66475, 1759, 1651, 11, 912, 501, 11, 2711, 624, 286, 220, 18, 13, 220, 3070, 28488, 25517, 66475, 362, 7177, 315, 7388, 320, 68, 1302, 2572, 330, 43610, 9676, 497, 330, 4021, 39969, 899, 429, 1184, 6645, 14417, 624, 286, 220, 19, 13, 220, 3070, 641, 40458, 66475, 1759, 315, 7907, 63594, 11, 2639, 14838, 320, 63157, 16327, 2459, 4292, 286, 220, 20, 13, 220, 3070, 6086, 14, 8525, 66475, 14615, 1196, 5003, 382, 18, 13, 220, 3070, 8303, 14309, 12, 8303, 30691, 9676, 25, 55798, 262, 353, 256, 3070, 8303, 220, 16, 25, 9305, 28496, 320, 76946, 1648, 1019, 286, 353, 256, 30466, 611, 877, 428, 676, 755, 63, 5476, 624, 286, 353, 256, 30466, 3722, 43376, 369, 27137, 624, 286, 353, 256, 30466, 2708, 43376, 369, 1909, 3619, 624, 286, 353, 256, 30466, 3817, 43376, 369, 8740, 2213, 624, 286, 353, 256, 5650, 1127, 369, 330, 2212, 12271, 497, 330, 4021, 39969, 497, 330, 28488, 586, 6145, 11431, 262, 353, 256, 3070, 8303, 220, 17, 25, 15167, 46278, 2718, 320, 9590, 82, 1648, 1019, 286, 353, 256, 16913, 609, 46575, 320, 3306, 476, 1849, 32823, 4292, 286, 353, 256, 26060, 2011, 81030, 369, 6789, 624, 286, 353, 256, 6795, 2884, 369, 10467, 323, 11464, 624, 286, 353, 256, 8103, 60013, 320, 19539, 369, 53720, 11, 25384, 369, 41604, 11, 3731, 369, 1032, 28205, 4292, 286, 353, 256, 4058, 5930, 369, 19511, 6239, 323, 13220, 8567, 624, 286, 353, 256, 69940, 32817, 320, 71, 46387, 5022, 369, 6371, 3593, 262, 353, 256, 3070, 8303, 220, 18, 25, 12907, 35919, 320, 5152, 2719, 1648, 1019, 286, 353, 256, 353, 1397, 9547, 53031, 362, 4285, 3553 ], \"created_at\": \"2026-02-19T03:47:49.809512Z\", \"done\": true, \"done_reason\": \"length\", \"eval_count\": 512, \"eval_duration\": 13490174451, \"load_duration\": 218033000, \"model\": \"glm-4.7-flash:latest\", \"prompt_eval_count\": 21, \"prompt_eval_duration\": 5760249292, \"response\": \"\", \"thinking\": \"Here's a thinking process that leads to the suggested SaaS CRM application:\\n\\n1. **Analyze the Request:**\\n * **Goal:** Build a SaaS CRM (Customer Relationship Management) application.\\n * **Key Features:** Approvals (workflow), Invoices (billing), and Operator Tooling (dashboard/management).\\n * **Constraints:** Single HTML file, vanilla HTML/CSS/JS (no frameworks), no native alerts, modern UI/UX, responsive, interactive, semantic HTML.\\n\\n2. **Conceptualization & Architecture:**\\n * *Theme:* Professional, clean, trustworthy (SaaS vibe). Blue/Indigo color palette is standard for CRM.\\n * *Layout:* Sidebar navigation (collapsible on mobile), top header (user profile, notifications), main content area.\\n * *Data Structure (Mock Data):* Since there's no backend, I need a robust JavaScript object to hold state (Customers, Leads, Invoices, Approval Requests).\\n * *Views:*\\n 1. **Dashboard:** Overview stats, recent activity.\\n 2. **Leads/Customers:** List view, add new, search.\\n 3. **Approvals:** A queue of requests (e.g., \\\"Upgrade Plan\\\", \\\"Create Invoice\\\") that need manager approval.\\n 4. **Invoices:** List of generated invoices, status tracking (Paid/Pending).\\n 5. **Settings/Profile:** Basic user settings.\\n\\n3. **Step-by-Step Implementation Plan:**\\n\\n * **Step 1: HTML Structure (Skeleton):**\\n * `<div id=\\\"app\\\">` container.\\n * `<nav>` for sidebar.\\n * `<header>` for top bar.\\n * `<main>` for dynamic content.\\n * Modals for \\\"Add Customer\\\", \\\"Create Invoice\\\", \\\"Approve Request\\\".\\n\\n * **Step 2: CSS Styling (Visuals):**\\n * Reset & Typography (Inter or system fonts).\\n * Flexbox/Grid for layout.\\n * Card design for stats and lists.\\n * Status badges (Green for Paid, Yellow for Pending, Red for Rejected).\\n * Transitions for hover effects and modal opening.\\n * Responsive adjustments (hamburger menu for mobile).\\n\\n * **Step 3: JavaScript Logic (Functionality):**\\n * *State Management:* A simple store\", \"total_duration\": 19589173625 }, \"generated_at\": \"2026-02-19T03:47:49.845654631Z\", \"source_mode\": \"local\" }, \"tenant_id\": \"t_acme\" } }"
+        - article [ref=e101]:
+          - heading "Generated Code" [level=3] [ref=e102]
+          - generic [ref=e103]:
+            - generic [ref=e104]:
+              - button "apps/ui-hook-proof-app/README.md" [ref=e181] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/api/openapi.yaml" [ref=e182] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/blueprint.yaml" [ref=e183] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/boilerplate/violet_rails_extension.md" [ref=e184] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/clients/mobile/app.css" [ref=e185] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/clients/mobile/app.js" [ref=e186] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/clients/web/app.css" [ref=e187] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/clients/web/app.js" [ref=e188] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/src/agent_contract.ts" [ref=e189] [cursor=pointer]
+              - button "apps/ui-hook-proof-app/workflows/definitions.json" [ref=e190] [cursor=pointer]
+            - generic [ref=e105]: "# UI Hook Proof App Generated from prompt-driven confirmation. ## Template - `violet-rails-extension` (source: `violet-rails`) ## Run - Validate blueprint - Execute verify checks - Create deploy intent (managed)"
+        - article [ref=e106]:
+          - heading "Terminal" [level=3] [ref=e107]
+          - generic [ref=e108]:
+            - textbox "help, ls, tree, cat apps/.../blueprint.yaml, grep policy" [ref=e109]
+            - button "Run" [ref=e110] [cursor=pointer]
+          - generic [ref=e111]: $ scaffold init --template deterministic-saas $ scaffold app --name "UI Hook Proof App" --region us-east-1 --plan starter $ scaffold contracts --human-api --agent-api $ scaffold verify --checks schema,policy,deploy_preflight $ scaffold deploy --target managed $ build complete
+        - article [ref=e112]:
+          - heading "Console" [level=3] [ref=e113]
+          - generic [ref=e114]: "[planner] prompt parsed and normalized [designer] structured confirmation converted to blueprint [builder] workload graph created [builder] code artifacts generated [runner] verify/deploy hooks prepared"

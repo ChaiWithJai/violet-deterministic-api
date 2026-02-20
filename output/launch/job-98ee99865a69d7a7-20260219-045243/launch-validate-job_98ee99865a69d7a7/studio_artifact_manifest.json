@@ -1,0 +1,195 @@
+{
+  "generated_at": "2026-02-19T04:52:35.515792888Z",
+  "workspace_path": "output/studio/job_98ee99865a69d7a7",
+  "files": [
+    {
+      "path": "apps/launch-validate/README.md",
+      "language": "markdown",
+      "category": "docs",
+      "size_bytes": 215
+    },
+    {
+      "path": "apps/launch-validate/api/openapi.yaml",
+      "language": "yaml",
+      "category": "api_contract",
+      "size_bytes": 303
+    },
+    {
+      "path": "apps/launch-validate/blueprint.yaml",
+      "language": "yaml",
+      "category": "misc",
+      "size_bytes": 408
+    },
+    {
+      "path": "apps/launch-validate/boilerplate/violet_rails_extension.md",
+      "language": "markdown",
+      "category": "migration_note",
+      "size_bytes": 550
+    },
+    {
+      "path": "apps/launch-validate/clients/mobile/app.css",
+      "language": "css",
+      "category": "mobile_client",
+      "size_bytes": 1744
+    },
+    {
+      "path": "apps/launch-validate/clients/mobile/app.js",
+      "language": "javascript",
+      "category": "mobile_client",
+      "size_bytes": 2740
+    },
+    {
+      "path": "apps/launch-validate/clients/mobile/index.html",
+      "language": "html",
+      "category": "mobile_client",
+      "size_bytes": 327
+    },
+    {
+      "path": "apps/launch-validate/clients/web/app.css",
+      "language": "css",
+      "category": "web_client",
+      "size_bytes": 2084
+    },
+    {
+      "path": "apps/launch-validate/clients/web/app.js",
+      "language": "javascript",
+      "category": "web_client",
+      "size_bytes": 3967
+    },
+    {
+      "path": "apps/launch-validate/clients/web/index.html",
+      "language": "html",
+      "category": "web_client",
+      "size_bytes": 324
+    },
+    {
+      "path": "apps/launch-validate/deploy/managed/deploy-intent.json",
+      "language": "json",
+      "category": "deploy",
+      "size_bytes": 134
+    },
+    {
+      "path": "apps/launch-validate/deploy/self-host/docker-compose.yaml",
+      "language": "yaml",
+      "category": "deploy",
+      "size_bytes": 300
+    },
+    {
+      "path": "apps/launch-validate/package.json",
+      "language": "json",
+      "category": "misc",
+      "size_bytes": 290
+    },
+    {
+      "path": "apps/launch-validate/services/api/Dockerfile",
+      "language": "dockerfile",
+      "category": "backend_service",
+      "size_bytes": 305
+    },
+    {
+      "path": "apps/launch-validate/services/api/README.md",
+      "language": "markdown",
+      "category": "backend_service",
+      "size_bytes": 337
+    },
+    {
+      "path": "apps/launch-validate/services/api/cmd/server/main.go",
+      "language": "go",
+      "category": "backend_service",
+      "size_bytes": 812
+    },
+    {
+      "path": "apps/launch-validate/services/api/go.mod",
+      "language": "go",
+      "category": "backend_service",
+      "size_bytes": 55
+    },
+    {
+      "path": "apps/launch-validate/services/api/internal/integrations/stripe_adapter.go",
+      "language": "go",
+      "category": "integration_adapter",
+      "size_bytes": 277
+    },
+    {
+      "path": "apps/launch-validate/services/api/internal/policy/rules.yaml",
+      "language": "yaml",
+      "category": "backend_service",
+      "size_bytes": 243
+    },
+    {
+      "path": "apps/launch-validate/services/api/internal/runtime/server.go",
+      "language": "go",
+      "category": "backend_service",
+      "size_bytes": 2364
+    },
+    {
+      "path": "apps/launch-validate/services/api/internal/runtime/server_test.go",
+      "language": "go",
+      "category": "backend_service",
+      "size_bytes": 395
+    },
+    {
+      "path": "apps/launch-validate/services/api/internal/tools/catalog.go",
+      "language": "go",
+      "category": "backend_service",
+      "size_bytes": 735
+    },
+    {
+      "path": "apps/launch-validate/services/api/internal/tools/contracts.ts",
+      "language": "typescript",
+      "category": "backend_service",
+      "size_bytes": 644
+    },
+    {
+      "path": "apps/launch-validate/services/api/tests/smoke.sh",
+      "language": "bash",
+      "category": "backend_service",
+      "size_bytes": 170
+    },
+    {
+      "path": "apps/launch-validate/src/agent_contract.ts",
+      "language": "typescript",
+      "category": "misc",
+      "size_bytes": 322
+    },
+    {
+      "path": "apps/launch-validate/tests/smoke.yaml",
+      "language": "yaml",
+      "category": "test",
+      "size_bytes": 294
+    },
+    {
+      "path": "apps/launch-validate/workflows/definitions.json",
+      "language": "json",
+      "category": "workflow",
+      "size_bytes": 68
+    }
+  ],
+  "run_targets": [
+    {
+      "name": "web",
+      "description": "Validate web runtime artifacts",
+      "command": "studio run web"
+    },
+    {
+      "name": "mobile",
+      "description": "Validate mobile runtime artifacts",
+      "command": "studio run mobile"
+    },
+    {
+      "name": "api",
+      "description": "Validate backend contract artifacts",
+      "command": "studio run api"
+    },
+    {
+      "name": "verify",
+      "description": "Run deterministic verification checks",
+      "command": "studio run verify"
+    },
+    {
+      "name": "all",
+      "description": "Run all checks",
+      "command": "studio run all"
+    }
+  ]
+}

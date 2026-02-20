@@ -1,0 +1,10 @@
+{
+  "name": "bundle-app",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Generated Violet Rails extension scaffold",
+  "scripts": {
+    "serve:web": "python3 -m http.server 4173 -d ./clients/web",
+    "serve:mobile": "python3 -m http.server 4174 -d ./clients/mobile"
+  }
+}

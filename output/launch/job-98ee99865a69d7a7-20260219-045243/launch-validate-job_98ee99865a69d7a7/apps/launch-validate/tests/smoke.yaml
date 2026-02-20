@@ -1,0 +1,9 @@
+name: generated-smoke
+description: Validate generated runtime and API contract for Launch Validate
+checks:
+  - id: web_runtime
+    assert: clients/web/index.html exists
+  - id: mobile_runtime
+    assert: clients/mobile/index.html exists
+  - id: api_contract
+    assert: api/openapi.yaml exists

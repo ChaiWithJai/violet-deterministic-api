@@ -1,0 +1,33 @@
+{
+  "release_id": "R1",
+  "name": "Prompt-to-Production Foundation",
+  "cycle": {
+    "start_date": "2026-02-23",
+    "end_date": "2026-04-03",
+    "cooldown_start": "2026-04-06",
+    "cooldown_end": "2026-04-17",
+    "appetite_weeks": 6
+  },
+  "status_values": [
+    "shaped",
+    "bet_accepted",
+    "uphill",
+    "downhill",
+    "done",
+    "cut",
+    "blocked"
+  ],
+  "priority_values": [
+    "P0",
+    "P1",
+    "P2"
+  ],
+  "scope_codes": {
+    "S1": "Deterministic Core API",
+    "S2": "Policy + Ranking Runtime",
+    "S3": "App Builder Control APIs",
+    "S4": "Verify APIs and Test Harness",
+    "S5": "Deployment Punchout",
+    "S6": "Migration and Deprecation Readiness"
+  }
+}

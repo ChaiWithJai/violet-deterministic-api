@@ -1,0 +1,11 @@
+[master]
+n_jobs = 1
+meta_timeout = "10s"
+dashboard_user_name = "admin"
+dashboard_password = "admin"
+
+[server]
+api_key = "vda-demo-key"
+
+[recommend]
+cache_size = 100

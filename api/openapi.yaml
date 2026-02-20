@@ -1,0 +1,639 @@
+openapi: 3.1.0
+info:
+  title: Violet Deterministic API
+  version: 0.4.0
+servers:
+  - url: http://localhost:4020
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+  schemas:
+    StudioCreateJobRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt:
+          type: string
+        app_name:
+          type: string
+        domain:
+          type: string
+        template:
+          type: string
+          description: Boilerplate template selector, defaults to violet-rails-extension.
+        source_system:
+          type: string
+          description: Source baseline for migration/extension metadata.
+        primary_users:
+          type: array
+          items:
+            type: string
+        core_workflows:
+          type: array
+          items:
+            type: string
+        data_entities:
+          type: array
+          items:
+            type: string
+        deployment_target:
+          type: string
+        region:
+          type: string
+        plan:
+          type: string
+        integrations:
+          type: array
+          items:
+            type: string
+        constraints:
+          type: array
+          items:
+            type: string
+    AgentClarifyRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt:
+          type: string
+        confirmation:
+          $ref: '#/components/schemas/StudioCreateJobRequest'
+        answers:
+          type: object
+          additionalProperties:
+            type: string
+    AgentClarifyQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+        field:
+          type: string
+        prompt:
+          type: string
+        why:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+    AgentClarifyResponse:
+      type: object
+      properties:
+        clarification_id:
+          type: string
+        tenant_id:
+          type: string
+        answer_count:
+          type: integer
+        ready_to_generate:
+          type: boolean
+        remaining_questions:
+          type: integer
+        missing_fields:
+          type: array
+          items:
+            type: string
+        summary:
+          type: string
+        updated_confirmation:
+          $ref: '#/components/schemas/StudioCreateJobRequest'
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentClarifyQuestion'
+    LLMInferRequest:
+      type: object
+      required: [prompt]
+      properties:
+        provider:
+          type: string
+        model:
+          type: string
+        prompt:
+          type: string
+        system:
+          type: string
+        temperature:
+          type: number
+        max_tokens:
+          type: integer
+        post_hooks:
+          type: array
+          items:
+            type: string
+          description: Include `studio_generate` to auto-create a Studio build job after inference.
+        hook_confirmation:
+          $ref: '#/components/schemas/StudioCreateJobRequest'
+    LLMInferResponse:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        result:
+          type: object
+          additionalProperties: true
+        hooks:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+paths:
+  /v1/health:
+    get:
+      summary: Service health and deterministic metadata
+      responses:
+        '200':
+          description: OK
+
+  /v1/decisions:
+    post:
+      summary: Deterministic decision generation
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Deterministic decision output
+        '401':
+          description: Unauthorized
+
+  /v1/replay:
+    post:
+      summary: Replay previously stored decision payload
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Replay result
+        '404':
+          description: Decision not found
+
+  /v1/feedback:
+    post:
+      summary: Feedback event ingestion
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Feedback accepted
+
+  /v1/apps:
+    post:
+      summary: Create app blueprint
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Created
+
+  /v1/apps/{id}:
+    get:
+      summary: Get app blueprint
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: App model
+        '404':
+          description: Not found
+    patch:
+      summary: Patch app blueprint
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Updated
+
+  /v1/apps/{id}/mutations:
+    post:
+      summary: Apply safe app mutation with policy check
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Mutation accepted
+        '403':
+          description: Mutation rejected by policy
+
+  /v1/apps/{id}/verify:
+    post:
+      summary: Verify app with machine-readable checks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Verification report
+
+  /v1/apps/{id}/deploy-intents/self-host:
+    post:
+      summary: Create self-host deploy intent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Deploy intent accepted
+
+  /v1/apps/{id}/deploy-intents/managed:
+    post:
+      summary: Create managed deploy intent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Deploy intent accepted
+
+  /v1/agents/plan:
+    post:
+      summary: Agent planning endpoint for blueprint proposal
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Plan proposal
+
+  /v1/agents/clarify:
+    post:
+      summary: Agent clarification endpoint for prompt/form alignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentClarifyRequest'
+      responses:
+        '200':
+          description: Clarification response with next questions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentClarifyResponse'
+
+  /v1/agents/act:
+    post:
+      summary: Agent act endpoint for one deterministic mutation
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Mutation result
+        '403':
+          description: Mutation denied by policy
+
+  /v1/agents/verify:
+    post:
+      summary: Agent verify endpoint with machine-readable checks
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Verification report
+
+  /v1/agents/deploy:
+    post:
+      summary: Agent deploy endpoint for self-host or managed intent
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Deploy intent accepted
+
+  /v1/llm/providers:
+    get:
+      summary: List configured model providers and current model availability
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Provider inventory
+
+  /v1/llm/infer:
+    post:
+      summary: Run one model call against local or frontier provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LLMInferRequest'
+      responses:
+        '200':
+          description: Inference result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMInferResponse'
+        '400':
+          description: Invalid request
+        '502':
+          description: Upstream provider error
+        '503':
+          description: Provider unavailable
+
+  /v1/tools:
+    get:
+      summary: List API tools and CLI command mappings for agent orchestration
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tool catalog
+
+  /v1/studio/jobs:
+    post:
+      summary: Create a generated build job from structured confirmation
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudioCreateJobRequest'
+      responses:
+        '201':
+          description: Build job created
+
+  /v1/studio/jobs/{id}:
+    get:
+      summary: Get build job details including workload and files
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Build job details
+        '404':
+          description: Job not found
+
+  /v1/studio/jobs/{id}/artifacts:
+    get:
+      summary: Get generated artifact manifest and available run targets
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Artifact manifest
+
+  /v1/studio/jobs/{id}/run:
+    post:
+      summary: Execute a named run target (web/mobile/api/verify/all) for generated artifacts and runtime smoke checks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Run target result
+
+  /v1/studio/jobs/{id}/verification:
+    get:
+      summary: Get machine-readable verification report for generated artifacts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Verification report
+
+  /v1/studio/jobs/{id}/jtbd:
+    get:
+      summary: Get JTBD coverage report for generated output
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: JTBD coverage payload
+
+  /v1/studio/jobs/{id}/bundle:
+    get:
+      summary: Download generated workspace bundle as tar.gz
+      description: Supports bearer auth header; browser downloads may pass `token` query param.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: token
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tarball containing generated app workspace and artifact manifest
+
+  /v1/studio/jobs/{id}/preview:
+    get:
+      summary: Render a clickable client preview for generated web or mobile surface
+      description: Supports bearer auth header; browser iframe clients may pass `token` query param.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: client
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [web, mobile]
+        - name: token
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: HTML preview document
+
+  /v1/studio/jobs/{id}/runtime/{client}/{asset}:
+    get:
+      summary: Serve generated runtime assets for web/mobile preview clients
+      description: Used by preview iframes to load executable CSS/JS for the generated app experience.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: client
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [web, mobile]
+        - name: asset
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: token
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Runtime asset bytes
+
+  /v1/studio/jobs/{id}/terminal:
+    post:
+      summary: Run a terminal command against generated artifacts
+      description: Use built-ins (`help`, `ls`, `tree`, `cat`, `grep`) or `exec <shell-command>` to run inside the materialized workspace path.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Command output
+
+  /v1/studio/jobs/{id}/console:
+    get:
+      summary: Read generated job console logs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Console log stream
+
+  /v1/studio/jobs/{id}/events:
+    get:
+      summary: Stream build job updates over SSE for live terminal and console views
+      description: Supports bearer auth header; browser EventSource clients may also pass `token` query param.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: token
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: SSE stream with `job` events carrying full job snapshots

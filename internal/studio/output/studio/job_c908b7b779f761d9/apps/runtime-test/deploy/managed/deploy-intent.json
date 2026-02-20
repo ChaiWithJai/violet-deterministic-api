@@ -1,0 +1,7 @@
+{
+  "target": "managed",
+  "app_name": "Runtime Test",
+  "region": "us-east-1",
+  "plan": "enterprise",
+  "requires_approval": true
+}

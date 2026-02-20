@@ -1,0 +1,18 @@
+app:
+  name: Runtime Test
+  domain: crm
+  template: violet-rails-extension
+  source_system: violet-rails
+  plan: enterprise
+  region: us-east-1
+  deployment_target: managed
+primary_users:
+  - admin
+entities:
+  - account
+workflows:
+  - create_customer
+integrations:
+  - stripe
+constraints:
+  - all_mutations_idempotent

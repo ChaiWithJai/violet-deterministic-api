@@ -1,0 +1,15 @@
+openapi: 3.1.0
+info:
+  title: Launch Validate API
+  version: 0.1.0
+paths:
+  /v1/launch-validate/health:
+    get:
+      responses:
+        '200':
+          description: OK
+  /v1/launch-validate/workflows/execute:
+    post:
+      responses:
+        '200':
+          description: Workflow execution result

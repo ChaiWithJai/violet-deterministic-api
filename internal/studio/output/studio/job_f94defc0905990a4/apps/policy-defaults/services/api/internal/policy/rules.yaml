@@ -1,0 +1,16 @@
+version: v1
+constraints:
+  - all_mutations_idempotent
+  - no_runtime_eval
+  - tenant_scope_required
+workflows:
+  - create_record
+  - approve_record
+  - notify_user
+users:
+  - admin
+  - operator
+entities:
+  - account
+  - workspace
+  - activity

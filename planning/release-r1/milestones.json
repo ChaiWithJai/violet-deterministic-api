@@ -1,0 +1,45 @@
+{
+  "release_id": "R1",
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Deterministic Core Locked",
+      "target_date": "2026-02-27",
+      "gates": [
+        "Persistent idempotency and replay contract merged",
+        "Decision hash and metadata contract stable",
+        "Auth and tenant boundary skeleton merged"
+      ]
+    },
+    {
+      "id": "M2",
+      "name": "Policy + Ranking Integrated",
+      "target_date": "2026-03-13",
+      "gates": [
+        "Gorse adapter integrated in pipeline",
+        "GoRules adapter integrated and versioned",
+        "Deterministic tie-breaker tests pass"
+      ]
+    },
+    {
+      "id": "M3",
+      "name": "End-to-End Build/Verify Path",
+      "target_date": "2026-03-20",
+      "gates": [
+        "App blueprint APIs available",
+        "Verify endpoint returns machine-readable assertions",
+        "Agent contract examples pass"
+      ]
+    },
+    {
+      "id": "M4",
+      "name": "Release Candidate",
+      "target_date": "2026-04-01",
+      "gates": [
+        "Replay mismatch <= 0.5% on fixture suite",
+        "p95 latency target satisfied in controlled load run",
+        "Self-host and managed punchout contracts documented"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "release_id": "R1",
+  "risks": [
+    {
+      "id": "RISK-001",
+      "title": "Determinism drift under asynchronous updates",
+      "severity": "high",
+      "owner_role": "backend",
+      "mitigation": "Snapshot data_version + policy_version in every decision and replay against stored artifacts",
+      "exit_criteria": "Replay mismatch <= 0.5%"
+    },
+    {
+      "id": "RISK-002",
+      "title": "Policy/ranking conflict generates unstable ordering",
+      "severity": "high",
+      "owner_role": "decision-engine",
+      "mitigation": "Single canonical sort and conflict resolution layer",
+      "exit_criteria": "Deterministic ranking test suite green"
+    },
+    {
+      "id": "RISK-003",
+      "title": "Tenant isolation gaps in agent-managed flows",
+      "severity": "critical",
+      "owner_role": "security",
+      "mitigation": "Mandatory tenant claims, per-tenant auth scopes, deny-by-default middleware",
+      "exit_criteria": "Security review signed off"
+    },
+    {
+      "id": "RISK-004",
+      "title": "Migration mismatches from Violet structures",
+      "severity": "high",
+      "owner_role": "migration",
+      "mitigation": "Golden fixture translation tests and explicit reject paths",
+      "exit_criteria": "Parity suite coverage >= 90% target fixtures"
+    },
+    {
+      "id": "RISK-005",
+      "title": "Scope overflow beyond cycle appetite",
+      "severity": "medium",
+      "owner_role": "shaper",
+      "mitigation": "Circuit breaker at Week 3 and no-go enforcement",
+      "exit_criteria": "No unbounded ticket additions after Week 2"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+{
+  "workflows": ["create_record","approve_record","notify_user"]
+}

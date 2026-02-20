@@ -1,0 +1,16 @@
+# binaries
+bin/
+*.out
+
+# env
+.env
+
+# os
+.DS_Store
+
+# ide
+.vscode/
+.idea/
+
+# web
+web/node_modules/

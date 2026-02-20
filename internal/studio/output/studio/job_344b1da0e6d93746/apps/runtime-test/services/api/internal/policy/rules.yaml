@@ -1,0 +1,11 @@
+version: v1
+constraints:
+  - all_mutations_idempotent
+  - no_runtime_eval
+  - tenant_scope_required
+workflows:
+  - create_customer
+users:
+  - admin
+entities:
+  - account

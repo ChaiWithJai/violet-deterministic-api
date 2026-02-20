@@ -1,0 +1,163 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - paragraph [ref=e3]: Human + Agent Build Studio
+    - heading "Prompt -> Confirm -> Generate -> Inspect" [level=1] [ref=e4]
+    - paragraph [ref=e5]: Design the app as a real user, align the structured scope, then inspect workload, generated code, terminal, and console output.
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - text: API Base URL
+        - textbox "API Base URL" [ref=e8]:
+          - /placeholder: http://localhost:4020
+          - text: http://localhost:4020
+      - generic [ref=e9]:
+        - text: Bearer Token
+        - textbox "Bearer Token" [ref=e10]: dev-token
+      - button "Check Health" [ref=e11] [cursor=pointer]
+    - generic [ref=e12]: "{ \"status\": 200, \"body\": { \"data_version\": \"data-v1\", \"idempotency_cleanup_deleted_total\": 0, \"policy_version\": \"policy-v1\", \"service\": \"violet-deterministic-api\", \"status\": \"ok\" } }"
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - heading "1) Prompt" [level=2] [ref=e15]
+      - generic [ref=e16]:
+        - text: What should this app do?
+        - textbox "What should this app do?" [ref=e17]:
+          - /placeholder: Build a personalized SaaS CRM with approvals, invoicing, and support automation.
+      - button "Draft Structured Spec" [ref=e19] [cursor=pointer]
+    - generic [ref=e21]:
+      - heading "2) Confirmation Form" [level=2] [ref=e22]
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - text: App Name
+          - textbox "App Name" [ref=e25]:
+            - /placeholder: Acme CRM
+        - generic [ref=e26]:
+          - text: Domain
+          - textbox "Domain" [ref=e27]:
+            - /placeholder: crm
+        - generic [ref=e28]:
+          - text: Template
+          - textbox "Template" [ref=e29]: violet-rails-extension
+        - generic [ref=e30]:
+          - text: Source System
+          - textbox "Source System" [ref=e31]: violet-rails
+        - generic [ref=e32]:
+          - text: Plan
+          - combobox "Plan" [ref=e33]:
+            - option "starter" [selected]
+            - option "enterprise"
+        - generic [ref=e34]:
+          - text: Region
+          - textbox "Region" [ref=e35]: us-east-1
+        - generic [ref=e36]:
+          - text: Deployment Target
+          - combobox "Deployment Target" [ref=e37]:
+            - option "managed" [selected]
+            - option "self-host"
+      - generic [ref=e38]:
+        - text: Primary Users (one per line)
+        - textbox "Primary Users (one per line)" [ref=e39]:
+          - /placeholder: admin\noperations\ncustomer_success
+      - generic [ref=e40]:
+        - text: Core Workflows (one per line)
+        - textbox "Core Workflows (one per line)" [ref=e41]:
+          - /placeholder: create_customer\napprove_quote\nissue_invoice
+      - generic [ref=e42]:
+        - text: Data Entities (one per line)
+        - textbox "Data Entities (one per line)" [ref=e43]:
+          - /placeholder: account\ncontact\ninvoice
+      - generic [ref=e44]:
+        - text: Integrations (one per line)
+        - textbox "Integrations (one per line)" [ref=e45]:
+          - /placeholder: stripe\nslack
+      - generic [ref=e46]:
+        - text: Constraints (one per line)
+        - textbox "Constraints (one per line)" [ref=e47]:
+          - /placeholder: no_runtime_eval\nall_mutations_idempotent
+      - generic [ref=e48]:
+        - button "Align & Preview Structure" [ref=e49] [cursor=pointer]
+        - button "Generate Build Job" [ref=e50] [cursor=pointer]
+    - generic [ref=e53]:
+      - heading "3) What Is Being Made" [level=2] [ref=e54]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - text: "Job ID:"
+          - code [ref=e57]: (none)
+        - generic [ref=e58]:
+          - text: "Status:"
+          - code [ref=e59]: idle
+        - generic [ref=e60]:
+          - text: "Workspace:"
+          - code [ref=e61]: (none)
+        - generic [ref=e62]:
+          - text: "Stream:"
+          - code [ref=e63]: idle
+      - generic [ref=e64]:
+        - article [ref=e65]:
+          - heading "Workload Preview" [level=3] [ref=e66]
+        - article [ref=e67]:
+          - heading "Live App Preview" [level=3] [ref=e68]
+          - generic [ref=e69]:
+            - button "Refresh Preview" [ref=e70] [cursor=pointer]
+            - link "Open Web" [ref=e71] [cursor=pointer]:
+              - /url: "#"
+            - link "Open Mobile" [ref=e72] [cursor=pointer]:
+              - /url: "#"
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: Web Client
+              - iframe [ref=e76]:
+                
+            - generic [ref=e77]:
+              - generic [ref=e78]: Mobile Client
+              - iframe [ref=e79]:
+                
+        - article [ref=e80]:
+          - heading "Model Router (Local + Frontier)" [level=3] [ref=e81]
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - text: Provider
+              - combobox "Provider" [ref=e84]:
+                - option "ollama" [selected]
+                - option "frontier"
+            - generic [ref=e85]:
+              - text: Model
+              - textbox "Model" [ref=e86]: glm-4.7-flash:latest
+            - generic [ref=e87]:
+              - text: Temperature
+              - spinbutton "Temperature" [ref=e88]: "0.1"
+            - generic [ref=e89]:
+              - text: Max Tokens
+              - spinbutton "Max Tokens" [ref=e90]: "512"
+          - generic [ref=e91]:
+            - text: System Prompt
+            - textbox "System Prompt" [ref=e92]:
+              - /placeholder: You are a deterministic coding agent.
+          - generic [ref=e93]:
+            - text: Prompt
+            - textbox "Prompt" [ref=e94]:
+              - /placeholder: Draft an implementation plan for tenant-scoped RBAC + billing entitlements.
+              - text: "Return only: ok"
+          - generic [ref=e95]:
+            - checkbox "Auto-generate boilerplate + previews after model call" [checked] [ref=e96]
+            - text: Auto-generate boilerplate + previews after model call
+          - paragraph [ref=e97]: First model call may take 10-30s while local model warms up.
+          - generic [ref=e98]:
+            - button "Load Providers" [ref=e99] [cursor=pointer]
+            - button "Run Model Call" [ref=e100] [cursor=pointer]
+          - generic [ref=e101]: "{ \"status\": 200, \"body\": { \"default_model\": \"glm-4.7-flash:latest\", \"default_provider\": \"ollama\", \"providers\": [ { \"name\": \"ollama\", \"kind\": \"local\", \"base_url\": \"http://host.docker.internal:11434\", \"default_model\": \"glm-4.7-flash:latest\", \"reachable\": true, \"models\": [ \"glm-4.7-flash:latest\", \"gemma3:27b\" ] }, { \"name\": \"frontier\", \"kind\": \"remote\", \"base_url\": \"http://host.docker.internal:11434/v1\", \"default_model\": \"glm-4.7-flash:latest\", \"reachable\": true, \"models\": [ \"glm-4.7-flash:latest\", \"gemma3:27b\" ] } ] } }"
+        - article [ref=e103]:
+          - heading "Generated Code" [level=3] [ref=e104]
+        - article [ref=e108]:
+          - heading "Release Gate" [level=3] [ref=e109]
+          - generic [ref=e110]:
+            - button "Run Web" [ref=e111] [cursor=pointer]
+            - button "Run Mobile" [ref=e112] [cursor=pointer]
+            - button "Run API" [ref=e113] [cursor=pointer]
+            - button "Run Verify" [ref=e114] [cursor=pointer]
+            - button "Run All" [ref=e115] [cursor=pointer]
+        - article [ref=e120]:
+          - heading "Terminal" [level=3] [ref=e121]
+          - generic [ref=e122]:
+            - textbox "help, ls, tree, cat apps/.../blueprint.yaml, grep policy, exec ls apps/<slug>" [ref=e123]
+            - button "Run" [ref=e124] [cursor=pointer]
+        - article [ref=e126]:
+          - heading "Console" [level=3] [ref=e127]
